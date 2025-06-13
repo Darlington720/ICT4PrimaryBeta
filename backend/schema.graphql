@@ -1,0 +1,275 @@
+# School related types
+type School {
+  id: ID!
+  name: String!
+  district: String!
+  subCounty: String!
+  location: Location!
+  type: SchoolType!
+  environment: Environment!
+  enrollmentData: EnrollmentData!
+  contactInfo: ContactInfo!
+  reports: [ICTReport!]!
+}
+
+type Location {
+  latitude: Float!
+  longitude: Float!
+}
+
+type EnrollmentData {
+  totalStudents: Int!
+  maleStudents: Int!
+  femaleStudents: Int!
+}
+
+type ContactInfo {
+  principalName: String!
+  email: String!
+  phone: String!
+}
+
+# ICT Report related types
+type ICTReport {
+  id: ID!
+  schoolId: ID!
+  school: School!
+  date: String!
+  period: String!
+  infrastructure: Infrastructure!
+  usage: Usage!
+  software: Software!
+  capacity: Capacity!
+}
+
+type Infrastructure {
+  computers: Int!
+  tablets: Int!
+  projectors: Int!
+  printers: Int!
+  internetConnection: InternetConnection!
+  internetSpeedMbps: Float!
+  powerSource: [PowerSource!]!
+  powerBackup: Boolean!
+  functionalDevices: Int!
+}
+
+type Usage {
+  teachersUsingICT: Int!
+  totalTeachers: Int!
+  weeklyComputerLabHours: Int!
+  studentDigitalLiteracyRate: Float!
+}
+
+type Software {
+  operatingSystems: [String!]!
+  educationalSoftware: [String!]!
+  officeApplications: Boolean!
+}
+
+type Capacity {
+  ictTrainedTeachers: Int!
+  supportStaff: Int!
+}
+
+# Enums
+enum SchoolType {
+  Public
+  Private
+}
+
+enum Environment {
+  Urban
+  Rural
+}
+
+enum InternetConnection {
+  None
+  Slow
+  Medium
+  Fast
+}
+
+enum PowerSource {
+  NationalGrid
+  Solar
+  Generator
+}
+
+# Queries
+type Query {
+  schools(
+    page: Int
+    pageSize: Int
+    search: String
+    district: String
+  ): SchoolConnection!
+  
+  school(id: ID!): School
+  
+  reports(
+    schoolId: ID
+    period: String
+    page: Int
+    pageSize: Int
+  ): ICTReportConnection!
+  
+  report(id: ID!): ICTReport
+  
+  districts: [String!]!
+  summaryStats: SummaryStats!
+}
+
+# Mutations
+type Mutation {
+  createSchool(input: CreateSchoolInput!): School!
+  updateSchool(id: ID!, input: UpdateSchoolInput!): School!
+  deleteSchool(id: ID!): Boolean!
+  
+  createICTReport(input: CreateICTReportInput!): ICTReport!
+  updateICTReport(id: ID!, input: UpdateICTReportInput!): ICTReport!
+  deleteICTReport(id: ID!): Boolean!
+}
+
+# Pagination types
+type SchoolConnection {
+  edges: [SchoolEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type SchoolEdge {
+  node: School!
+  cursor: String!
+}
+
+type ICTReportConnection {
+  edges: [ICTReportEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ICTReportEdge {
+  node: ICTReport!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+# Statistics type
+type SummaryStats {
+  totalSchools: Int!
+  schoolsWithInternetPercent: Float!
+  averageComputers: Float!
+  topSchools: [SchoolStats!]!
+  districtDistribution: [DistrictStats!]!
+  environmentDistribution: EnvironmentStats!
+}
+
+type SchoolStats {
+  schoolId: ID!
+  name: String!
+  score: Float!
+}
+
+type DistrictStats {
+  district: String!
+  count: Int!
+}
+
+type EnvironmentStats {
+  urban: Int!
+  rural: Int!
+}
+
+# Input types
+input CreateSchoolInput {
+  name: String!
+  district: String!
+  subCounty: String!
+  location: LocationInput!
+  type: SchoolType!
+  environment: Environment!
+  enrollmentData: EnrollmentDataInput!
+  contactInfo: ContactInfoInput!
+}
+
+input UpdateSchoolInput {
+  name: String
+  district: String
+  subCounty: String
+  location: LocationInput
+  type: SchoolType
+  environment: Environment
+  enrollmentData: EnrollmentDataInput
+  contactInfo: ContactInfoInput
+}
+
+input LocationInput {
+  latitude: Float!
+  longitude: Float!
+}
+
+input EnrollmentDataInput {
+  maleStudents: Int!
+  femaleStudents: Int!
+}
+
+input ContactInfoInput {
+  principalName: String!
+  email: String!
+  phone: String!
+}
+
+input CreateICTReportInput {
+  schoolId: ID!
+  date: String!
+  period: String!
+  infrastructure: InfrastructureInput!
+  usage: UsageInput!
+  software: SoftwareInput!
+  capacity: CapacityInput!
+}
+
+input UpdateICTReportInput {
+  date: String
+  period: String
+  infrastructure: InfrastructureInput
+  usage: UsageInput
+  software: SoftwareInput
+  capacity: CapacityInput
+}
+
+input InfrastructureInput {
+  computers: Int!
+  tablets: Int!
+  projectors: Int!
+  printers: Int!
+  internetConnection: InternetConnection!
+  internetSpeedMbps: Float!
+  powerSource: [PowerSource!]!
+  powerBackup: Boolean!
+}
+
+input UsageInput {
+  teachersUsingICT: Int!
+  totalTeachers: Int!
+  weeklyComputerLabHours: Int!
+  studentDigitalLiteracyRate: Float!
+}
+
+input SoftwareInput {
+  operatingSystems: [String!]!
+  educationalSoftware: [String!]!
+  officeApplications: Boolean!
+}
+
+input CapacityInput {
+  ictTrainedTeachers: Int!
+  supportStaff: Int!
+}

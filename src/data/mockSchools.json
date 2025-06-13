@@ -1,0 +1,421 @@
+{
+  "schools": [
+    {
+      "id": "SCH001",
+      "name": "Green Hills Primary School",
+      "district": "Kampala",
+      "subCounty": "Nakawa",
+      "location": {
+        "latitude": 0.3476,
+        "longitude": 32.5825
+      },
+      "type": "Public",
+      "environment": "Urban",
+      "enrollmentData": {
+        "totalStudents": 850,
+        "maleStudents": 420,
+        "femaleStudents": 430
+      },
+      "contactInfo": {
+        "principalName": "Sarah Namukwaya",
+        "email": "greenhill.primary@education.ug",
+        "phone": "+256-772-555-001"
+      },
+      "infrastructure": {
+        "studentComputers": 35,
+        "teacherComputers": 10,
+        "projectors": 5,
+        "smartBoards": 2,
+        "tablets": 20,
+        "laptops": 15,
+        "hasComputerLab": true,
+        "labCondition": "Good",
+        "powerBackup": ["Solar", "Generator"],
+        "hasICTRoom": true
+      },
+      "internet": {
+        "connectionType": "Fiber",
+        "bandwidthMbps": 50,
+        "wifiCoverage": ["Administration", "Classrooms", "Library"],
+        "stability": "High",
+        "hasUsagePolicy": true
+      },
+      "software": {
+        "hasLMS": true,
+        "lmsName": "Moodle",
+        "hasLicensedSoftware": true,
+        "licensedSoftware": ["Microsoft Office 365", "Adobe Creative Cloud", "Typing Tutor"],
+        "hasProductivitySuite": true,
+        "productivitySuite": ["Microsoft Office", "Google Workspace"],
+        "hasDigitalLibrary": true,
+        "hasLocalContent": true
+      },
+      "humanCapacity": {
+        "ictTrainedTeachers": 20,
+        "totalTeachers": 35,
+        "supportStaff": 2,
+        "monthlyTrainings": 4,
+        "teacherCompetencyLevel": "Advanced"
+      },
+      "pedagogicalUsage": {
+        "ictIntegratedLessons": 25,
+        "usesICTAssessments": true,
+        "hasStudentProjects": true,
+        "usesBlendedLearning": true,
+        "hasAssistiveTech": true
+      },
+      "governance": {
+        "hasICTPolicy": true,
+        "alignedWithNationalStrategy": true,
+        "hasICTCommittee": true,
+        "hasICTBudget": true,
+        "hasMonitoringSystem": true
+      },
+      "studentEngagement": {
+        "digitalLiteracyLevel": "Advanced",
+        "hasICTClub": true,
+        "usesOnlinePlatforms": true,
+        "studentFeedbackRating": 4
+      },
+      "communityEngagement": {
+        "hasParentPortal": true,
+        "hasCommunityOutreach": true,
+        "hasIndustryPartners": true,
+        "partnerOrganizations": ["Microsoft", "Local ISP Provider", "Computer Aid International"]
+      }
+    },
+    {
+      "id": "SCH002",
+      "name": "Kawempe Junior School",
+      "district": "Kampala",
+      "subCounty": "Kawempe",
+      "location": {
+        "latitude": 0.3854,
+        "longitude": 32.5705
+      },
+      "type": "Public",
+      "environment": "Urban",
+      "enrollmentData": {
+        "totalStudents": 620,
+        "maleStudents": 310,
+        "femaleStudents": 310
+      },
+      "contactInfo": {
+        "principalName": "John Mukasa",
+        "email": "kawempe.junior@education.ug",
+        "phone": "+256-772-555-002"
+      },
+      "infrastructure": {
+        "studentComputers": 20,
+        "teacherComputers": 5,
+        "projectors": 2,
+        "smartBoards": 0,
+        "tablets": 10,
+        "laptops": 5,
+        "hasComputerLab": true,
+        "labCondition": "Fair",
+        "powerBackup": ["Generator"],
+        "hasICTRoom": false
+      },
+      "internet": {
+        "connectionType": "Mobile Broadband",
+        "bandwidthMbps": 10,
+        "wifiCoverage": ["Administration", "Classrooms"],
+        "stability": "Medium",
+        "hasUsagePolicy": true
+      },
+      "software": {
+        "hasLMS": false,
+        "hasLicensedSoftware": true,
+        "licensedSoftware": ["Microsoft Office 365"],
+        "hasProductivitySuite": true,
+        "productivitySuite": ["Microsoft Office"],
+        "hasDigitalLibrary": false,
+        "hasLocalContent": false
+      },
+      "humanCapacity": {
+        "ictTrainedTeachers": 8,
+        "totalTeachers": 25,
+        "supportStaff": 1,
+        "monthlyTrainings": 2,
+        "teacherCompetencyLevel": "Intermediate"
+      },
+      "pedagogicalUsage": {
+        "ictIntegratedLessons": 12,
+        "usesICTAssessments": true,
+        "hasStudentProjects": false,
+        "usesBlendedLearning": false,
+        "hasAssistiveTech": false
+      },
+      "governance": {
+        "hasICTPolicy": true,
+        "alignedWithNationalStrategy": true,
+        "hasICTCommittee": false,
+        "hasICTBudget": true,
+        "hasMonitoringSystem": false
+      },
+      "studentEngagement": {
+        "digitalLiteracyLevel": "Intermediate",
+        "hasICTClub": true,
+        "usesOnlinePlatforms": false,
+        "studentFeedbackRating": 3
+      },
+      "communityEngagement": {
+        "hasParentPortal": false,
+        "hasCommunityOutreach": true,
+        "hasIndustryPartners": false,
+        "partnerOrganizations": []
+      }
+    },
+    {
+      "id": "SCH003",
+      "name": "Sunrise Academy",
+      "district": "Wakiso",
+      "subCounty": "Nansana",
+      "location": {
+        "latitude": 0.3602,
+        "longitude": 32.5244
+      },
+      "type": "Private",
+      "environment": "Urban",
+      "enrollmentData": {
+        "totalStudents": 450,
+        "maleStudents": 220,
+        "femaleStudents": 230
+      },
+      "contactInfo": {
+        "principalName": "Grace Atim",
+        "email": "info@sunriseacademy.ug",
+        "phone": "+256-772-555-003"
+      },
+      "infrastructure": {
+        "studentComputers": 40,
+        "teacherComputers": 15,
+        "projectors": 8,
+        "smartBoards": 4,
+        "tablets": 30,
+        "laptops": 20,
+        "hasComputerLab": true,
+        "labCondition": "Excellent",
+        "powerBackup": ["Solar", "Generator", "UPS"],
+        "hasICTRoom": true
+      },
+      "internet": {
+        "connectionType": "Fiber",
+        "bandwidthMbps": 100,
+        "wifiCoverage": ["Administration", "Classrooms", "Library", "Dormitories"],
+        "stability": "High",
+        "hasUsagePolicy": true
+      },
+      "software": {
+        "hasLMS": true,
+        "lmsName": "Google Classroom",
+        "hasLicensedSoftware": true,
+        "licensedSoftware": ["Microsoft Office 365", "Adobe Creative Cloud", "Language Lab Software", "STEM Learning Suite"],
+        "hasProductivitySuite": true,
+        "productivitySuite": ["Microsoft Office", "Google Workspace"],
+        "hasDigitalLibrary": true,
+        "hasLocalContent": true
+      },
+      "humanCapacity": {
+        "ictTrainedTeachers": 25,
+        "totalTeachers": 30,
+        "supportStaff": 3,
+        "monthlyTrainings": 6,
+        "teacherCompetencyLevel": "Advanced"
+      },
+      "pedagogicalUsage": {
+        "ictIntegratedLessons": 35,
+        "usesICTAssessments": true,
+        "hasStudentProjects": true,
+        "usesBlendedLearning": true,
+        "hasAssistiveTech": true
+      },
+      "governance": {
+        "hasICTPolicy": true,
+        "alignedWithNationalStrategy": true,
+        "hasICTCommittee": true,
+        "hasICTBudget": true,
+        "hasMonitoringSystem": true
+      },
+      "studentEngagement": {
+        "digitalLiteracyLevel": "Advanced",
+        "hasICTClub": true,
+        "usesOnlinePlatforms": true,
+        "studentFeedbackRating": 5
+      },
+      "communityEngagement": {
+        "hasParentPortal": true,
+        "hasCommunityOutreach": true,
+        "hasIndustryPartners": true,
+        "partnerOrganizations": ["Microsoft", "Google for Education", "Local Tech Companies", "UNICEF"]
+      }
+    },
+    {
+      "id": "SCH004",
+      "name": "Rural Hope Primary School",
+      "district": "Mubende",
+      "subCounty": "Kassanda",
+      "location": {
+        "latitude": 0.5731,
+        "longitude": 31.7644
+      },
+      "type": "Public",
+      "environment": "Rural",
+      "enrollmentData": {
+        "totalStudents": 320,
+        "maleStudents": 180,
+        "femaleStudents": 140
+      },
+      "contactInfo": {
+        "principalName": "Peter Kagwa",
+        "email": "ruralhope@education.ug",
+        "phone": "+256-772-555-004"
+      },
+      "infrastructure": {
+        "studentComputers": 8,
+        "teacherComputers": 2,
+        "projectors": 1,
+        "smartBoards": 0,
+        "tablets": 0,
+        "laptops": 2,
+        "hasComputerLab": false,
+        "powerBackup": ["Solar"],
+        "hasICTRoom": false
+      },
+      "internet": {
+        "connectionType": "Mobile Broadband",
+        "bandwidthMbps": 5,
+        "wifiCoverage": ["Administration"],
+        "stability": "Low",
+        "hasUsagePolicy": false
+      },
+      "software": {
+        "hasLMS": false,
+        "hasLicensedSoftware": false,
+        "licensedSoftware": [],
+        "hasProductivitySuite": true,
+        "productivitySuite": ["Microsoft Office"],
+        "hasDigitalLibrary": false,
+        "hasLocalContent": false
+      },
+      "humanCapacity": {
+        "ictTrainedTeachers": 3,
+        "totalTeachers": 15,
+        "supportStaff": 0,
+        "monthlyTrainings": 1,
+        "teacherCompetencyLevel": "Basic"
+      },
+      "pedagogicalUsage": {
+        "ictIntegratedLessons": 5,
+        "usesICTAssessments": false,
+        "hasStudentProjects": false,
+        "usesBlendedLearning": false,
+        "hasAssistiveTech": false
+      },
+      "governance": {
+        "hasICTPolicy": false,
+        "alignedWithNationalStrategy": true,
+        "hasICTCommittee": false,
+        "hasICTBudget": false,
+        "hasMonitoringSystem": false
+      },
+      "studentEngagement": {
+        "digitalLiteracyLevel": "Basic",
+        "hasICTClub": false,
+        "usesOnlinePlatforms": false,
+        "studentFeedbackRating": 2
+      },
+      "communityEngagement": {
+        "hasParentPortal": false,
+        "hasCommunityOutreach": false,
+        "hasIndustryPartners": false,
+        "partnerOrganizations": []
+      }
+    },
+    {
+      "id": "SCH005",
+      "name": "Mbarara Children's Academy",
+      "district": "Mbarara",
+      "subCounty": "Mbarara City",
+      "location": {
+        "latitude": -0.6167,
+        "longitude": 30.6583
+      },
+      "type": "Private",
+      "environment": "Urban",
+      "enrollmentData": {
+        "totalStudents": 580,
+        "maleStudents": 270,
+        "femaleStudents": 310
+      },
+      "contactInfo": {
+        "principalName": "Elizabeth Tumusiime",
+        "email": "mbarara.academy@education.ug",
+        "phone": "+256-772-555-005"
+      },
+      "infrastructure": {
+        "studentComputers": 30,
+        "teacherComputers": 12,
+        "projectors": 6,
+        "smartBoards": 3,
+        "tablets": 25,
+        "laptops": 15,
+        "hasComputerLab": true,
+        "labCondition": "Good",
+        "powerBackup": ["Generator", "UPS"],
+        "hasICTRoom": true
+      },
+      "internet": {
+        "connectionType": "Fiber",
+        "bandwidthMbps": 75,
+        "wifiCoverage": ["Administration", "Classrooms", "Library"],
+        "stability": "High",
+        "hasUsagePolicy": true
+      },
+      "software": {
+        "hasLMS": true,
+        "lmsName": "Moodle",
+        "hasLicensedSoftware": true,
+        "licensedSoftware": ["Microsoft Office 365", "Educational Games Suite", "Digital Science Lab"],
+        "hasProductivitySuite": true,
+        "productivitySuite": ["Microsoft Office", "Google Workspace"],
+        "hasDigitalLibrary": true,
+        "hasLocalContent": true
+      },
+      "humanCapacity": {
+        "ictTrainedTeachers": 18,
+        "totalTeachers": 28,
+        "supportStaff": 2,
+        "monthlyTrainings": 4,
+        "teacherCompetencyLevel": "Advanced"
+      },
+      "pedagogicalUsage": {
+        "ictIntegratedLessons": 30,
+        "usesICTAssessments": true,
+        "hasStudentProjects": true,
+        "usesBlendedLearning": true,
+        "hasAssistiveTech": true
+      },
+      "governance": {
+        "hasICTPolicy": true,
+        "alignedWithNationalStrategy": true,
+        "hasICTCommittee": true,
+        "hasICTBudget": true,
+        "hasMonitoringSystem": true
+      },
+      "studentEngagement": {
+        "digitalLiteracyLevel": "Advanced",
+        "hasICTClub": true,
+        "usesOnlinePlatforms": true,
+        "studentFeedbackRating": 4
+      },
+      "communityEngagement": {
+        "hasParentPortal": true,
+        "hasCommunityOutreach": true,
+        "hasIndustryPartners": true,
+        "partnerOrganizations": ["Local Tech Companies", "Regional Education Office", "Digital Skills Foundation"]
+      }
+    }
+  ]
+}

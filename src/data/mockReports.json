@@ -1,0 +1,484 @@
+{
+  "reports": [
+    {
+      "id": "RPT001",
+      "schoolId": "SCH001",
+      "date": "2024-01-15",
+      "period": "Jan 2024",
+      "infrastructure": {
+        "computers": 20,
+        "tablets": 10,
+        "projectors": 2,
+        "printers": 1,
+        "internetConnection": "Slow",
+        "internetSpeedMbps": 5,
+        "powerSource": ["National Grid"],
+        "powerBackup": false,
+        "functionalDevices": 25
+      },
+      "usage": {
+        "teachersUsingICT": 8,
+        "totalTeachers": 25,
+        "weeklyComputerLabHours": 10,
+        "studentDigitalLiteracyRate": 35
+      },
+      "software": {
+        "operatingSystems": ["Windows 10"],
+        "educationalSoftware": ["Basic Math App"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 6,
+        "supportStaff": 1
+      }
+    },
+    {
+      "id": "RPT002",
+      "schoolId": "SCH001",
+      "date": "2024-05-10",
+      "period": "May 2024",
+      "infrastructure": {
+        "computers": 30,
+        "tablets": 15,
+        "projectors": 3,
+        "printers": 2,
+        "internetConnection": "Medium",
+        "internetSpeedMbps": 10,
+        "powerSource": ["National Grid", "Generator"],
+        "powerBackup": true,
+        "functionalDevices": 40
+      },
+      "usage": {
+        "teachersUsingICT": 12,
+        "totalTeachers": 25,
+        "weeklyComputerLabHours": 15,
+        "studentDigitalLiteracyRate": 45
+      },
+      "software": {
+        "operatingSystems": ["Windows 10", "Ubuntu"],
+        "educationalSoftware": ["Basic Math App", "Reading Assistant"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 10,
+        "supportStaff": 1
+      }
+    },
+    {
+      "id": "RPT003",
+      "schoolId": "SCH001",
+      "date": "2024-09-05",
+      "period": "Sept 2024",
+      "infrastructure": {
+        "computers": 50,
+        "tablets": 20,
+        "projectors": 5,
+        "printers": 3,
+        "internetConnection": "Fast",
+        "internetSpeedMbps": 25,
+        "powerSource": ["National Grid", "Generator", "Solar"],
+        "powerBackup": true,
+        "functionalDevices": 68
+      },
+      "usage": {
+        "teachersUsingICT": 20,
+        "totalTeachers": 28,
+        "weeklyComputerLabHours": 25,
+        "studentDigitalLiteracyRate": 60
+      },
+      "software": {
+        "operatingSystems": ["Windows 10", "Ubuntu", "Chrome OS"],
+        "educationalSoftware": ["Basic Math App", "Reading Assistant", "Science Simulator", "Coding Basics"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 18,
+        "supportStaff": 2
+      }
+    },
+    {
+      "id": "RPT004",
+      "schoolId": "SCH002",
+      "date": "2024-01-15",
+      "period": "Jan 2024",
+      "infrastructure": {
+        "computers": 10,
+        "tablets": 5,
+        "projectors": 1,
+        "printers": 1,
+        "internetConnection": "None",
+        "internetSpeedMbps": 0,
+        "powerSource": ["National Grid"],
+        "powerBackup": false,
+        "functionalDevices": 15
+      },
+      "usage": {
+        "teachersUsingICT": 3,
+        "totalTeachers": 20,
+        "weeklyComputerLabHours": 5,
+        "studentDigitalLiteracyRate": 20
+      },
+      "software": {
+        "operatingSystems": ["Windows 7"],
+        "educationalSoftware": [],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 2,
+        "supportStaff": 0
+      }
+    },
+    {
+      "id": "RPT005",
+      "schoolId": "SCH002",
+      "date": "2024-05-10",
+      "period": "May 2024",
+      "infrastructure": {
+        "computers": 10,
+        "tablets": 5,
+        "projectors": 1,
+        "printers": 1,
+        "internetConnection": "Slow",
+        "internetSpeedMbps": 2,
+        "powerSource": ["National Grid"],
+        "powerBackup": false,
+        "functionalDevices": 15
+      },
+      "usage": {
+        "teachersUsingICT": 5,
+        "totalTeachers": 20,
+        "weeklyComputerLabHours": 8,
+        "studentDigitalLiteracyRate": 25
+      },
+      "software": {
+        "operatingSystems": ["Windows 7", "Windows 10"],
+        "educationalSoftware": ["Basic Math App"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 3,
+        "supportStaff": 0
+      }
+    },
+    {
+      "id": "RPT006",
+      "schoolId": "SCH002",
+      "date": "2024-09-05",
+      "period": "Sept 2024",
+      "infrastructure": {
+        "computers": 12,
+        "tablets": 8,
+        "projectors": 2,
+        "printers": 1,
+        "internetConnection": "Slow",
+        "internetSpeedMbps": 5,
+        "powerSource": ["National Grid"],
+        "powerBackup": false,
+        "functionalDevices": 20
+      },
+      "usage": {
+        "teachersUsingICT": 8,
+        "totalTeachers": 22,
+        "weeklyComputerLabHours": 12,
+        "studentDigitalLiteracyRate": 30
+      },
+      "software": {
+        "operatingSystems": ["Windows 10"],
+        "educationalSoftware": ["Basic Math App", "Reading Assistant"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 5,
+        "supportStaff": 1
+      }
+    },
+    {
+      "id": "RPT007",
+      "schoolId": "SCH003",
+      "date": "2024-01-15",
+      "period": "Jan 2024",
+      "infrastructure": {
+        "computers": 30,
+        "tablets": 20,
+        "projectors": 4,
+        "printers": 2,
+        "internetConnection": "Medium",
+        "internetSpeedMbps": 15,
+        "powerSource": ["National Grid", "Generator"],
+        "powerBackup": true,
+        "functionalDevices": 50
+      },
+      "usage": {
+        "teachersUsingICT": 12,
+        "totalTeachers": 18,
+        "weeklyComputerLabHours": 20,
+        "studentDigitalLiteracyRate": 60
+      },
+      "software": {
+        "operatingSystems": ["Windows 10", "MacOS"],
+        "educationalSoftware": ["Comprehensive Learning Suite", "Language Lab", "Math Pro"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 10,
+        "supportStaff": 2
+      }
+    },
+    {
+      "id": "RPT008",
+      "schoolId": "SCH003",
+      "date": "2024-05-10",
+      "period": "May 2024",
+      "infrastructure": {
+        "computers": 35,
+        "tablets": 25,
+        "projectors": 5,
+        "printers": 3,
+        "internetConnection": "Fast",
+        "internetSpeedMbps": 25,
+        "powerSource": ["National Grid", "Generator"],
+        "powerBackup": true,
+        "functionalDevices": 60
+      },
+      "usage": {
+        "teachersUsingICT": 15,
+        "totalTeachers": 18,
+        "weeklyComputerLabHours": 25,
+        "studentDigitalLiteracyRate": 70
+      },
+      "software": {
+        "operatingSystems": ["Windows 10", "MacOS"],
+        "educationalSoftware": ["Comprehensive Learning Suite", "Language Lab", "Math Pro", "Science Simulator"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 12,
+        "supportStaff": 2
+      }
+    },
+    {
+      "id": "RPT009",
+      "schoolId": "SCH003",
+      "date": "2024-09-05",
+      "period": "Sept 2024",
+      "infrastructure": {
+        "computers": 40,
+        "tablets": 30,
+        "projectors": 6,
+        "printers": 4,
+        "internetConnection": "Fast",
+        "internetSpeedMbps": 50,
+        "powerSource": ["National Grid", "Generator", "Solar"],
+        "powerBackup": true,
+        "functionalDevices": 75
+      },
+      "usage": {
+        "teachersUsingICT": 18,
+        "totalTeachers": 20,
+        "weeklyComputerLabHours": 30,
+        "studentDigitalLiteracyRate": 85
+      },
+      "software": {
+        "operatingSystems": ["Windows 10", "MacOS", "Chrome OS"],
+        "educationalSoftware": ["Comprehensive Learning Suite", "Language Lab", "Math Pro", "Science Simulator", "Coding Basics"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 16,
+        "supportStaff": 3
+      }
+    },
+    {
+      "id": "RPT010",
+      "schoolId": "SCH004",
+      "date": "2024-01-15",
+      "period": "Jan 2024",
+      "infrastructure": {
+        "computers": 5,
+        "tablets": 0,
+        "projectors": 0,
+        "printers": 1,
+        "internetConnection": "None",
+        "internetSpeedMbps": 0,
+        "powerSource": ["Generator"],
+        "powerBackup": false,
+        "functionalDevices": 4
+      },
+      "usage": {
+        "teachersUsingICT": 1,
+        "totalTeachers": 12,
+        "weeklyComputerLabHours": 2,
+        "studentDigitalLiteracyRate": 10
+      },
+      "software": {
+        "operatingSystems": ["Windows 7"],
+        "educationalSoftware": [],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 1,
+        "supportStaff": 0
+      }
+    },
+    {
+      "id": "RPT011",
+      "schoolId": "SCH004",
+      "date": "2024-05-10",
+      "period": "May 2024",
+      "infrastructure": {
+        "computers": 5,
+        "tablets": 0,
+        "projectors": 0,
+        "printers": 1,
+        "internetConnection": "None",
+        "internetSpeedMbps": 0,
+        "powerSource": ["Generator"],
+        "powerBackup": false,
+        "functionalDevices": 4
+      },
+      "usage": {
+        "teachersUsingICT": 1,
+        "totalTeachers": 12,
+        "weeklyComputerLabHours": 2,
+        "studentDigitalLiteracyRate": 12
+      },
+      "software": {
+        "operatingSystems": ["Windows 7"],
+        "educationalSoftware": [],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 1,
+        "supportStaff": 0
+      }
+    },
+    {
+      "id": "RPT012",
+      "schoolId": "SCH004",
+      "date": "2024-09-05",
+      "period": "Sept 2024",
+      "infrastructure": {
+        "computers": 8,
+        "tablets": 5,
+        "projectors": 1,
+        "printers": 1,
+        "internetConnection": "Slow",
+        "internetSpeedMbps": 1,
+        "powerSource": ["Generator", "Solar"],
+        "powerBackup": true,
+        "functionalDevices": 12
+      },
+      "usage": {
+        "teachersUsingICT": 3,
+        "totalTeachers": 12,
+        "weeklyComputerLabHours": 6,
+        "studentDigitalLiteracyRate": 18
+      },
+      "software": {
+        "operatingSystems": ["Windows 7", "Android"],
+        "educationalSoftware": ["Basic Math App"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 2,
+        "supportStaff": 0
+      }
+    },
+    {
+      "id": "RPT013",
+      "schoolId": "SCH005",
+      "date": "2024-01-15",
+      "period": "Jan 2024",
+      "infrastructure": {
+        "computers": 25,
+        "tablets": 15,
+        "projectors": 3,
+        "printers": 2,
+        "internetConnection": "Medium",
+        "internetSpeedMbps": 12,
+        "powerSource": ["National Grid", "Generator"],
+        "powerBackup": true,
+        "functionalDevices": 40
+      },
+      "usage": {
+        "teachersUsingICT": 10,
+        "totalTeachers": 22,
+        "weeklyComputerLabHours": 18,
+        "studentDigitalLiteracyRate": 50
+      },
+      "software": {
+        "operatingSystems": ["Windows 10"],
+        "educationalSoftware": ["Learning Platform XYZ", "Math App"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 8,
+        "supportStaff": 1
+      }
+    },
+    {
+      "id": "RPT014",
+      "schoolId": "SCH005",
+      "date": "2024-05-10",
+      "period": "May 2024",
+      "infrastructure": {
+        "computers": 28,
+        "tablets": 20,
+        "projectors": 4,
+        "printers": 2,
+        "internetConnection": "Medium",
+        "internetSpeedMbps": 15,
+        "powerSource": ["National Grid", "Generator"],
+        "powerBackup": true,
+        "functionalDevices": 45
+      },
+      "usage": {
+        "teachersUsingICT": 14,
+        "totalTeachers": 22,
+        "weeklyComputerLabHours": 22,
+        "studentDigitalLiteracyRate": 55
+      },
+      "software": {
+        "operatingSystems": ["Windows 10"],
+        "educationalSoftware": ["Learning Platform XYZ", "Math App", "Language Lab"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 12,
+        "supportStaff": 1
+      }
+    },
+    {
+      "id": "RPT015",
+      "schoolId": "SCH005",
+      "date": "2024-09-05",
+      "period": "Sept 2024",
+      "infrastructure": {
+        "computers": 32,
+        "tablets": 25,
+        "projectors": 5,
+        "printers": 3,
+        "internetConnection": "Fast",
+        "internetSpeedMbps": 30,
+        "powerSource": ["National Grid", "Generator", "Solar"],
+        "powerBackup": true,
+        "functionalDevices": 55
+      },
+      "usage": {
+        "teachersUsingICT": 18,
+        "totalTeachers": 24,
+        "weeklyComputerLabHours": 25,
+        "studentDigitalLiteracyRate": 65
+      },
+      "software": {
+        "operatingSystems": ["Windows 10", "Chrome OS"],
+        "educationalSoftware": ["Learning Platform XYZ", "Math App", "Language Lab", "Coding Basics"],
+        "officeApplications": true
+      },
+      "capacity": {
+        "ictTrainedTeachers": 16,
+        "supportStaff": 2
+      }
+    }
+  ]
+}
