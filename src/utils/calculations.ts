@@ -26,26 +26,26 @@ export const calculateICTReadinessLevel = (reports: ICTReport[]): { level: 'Low'
   score += Math.min(15, Math.round(computerRatio * 15)); // Max 15 points for computers
   
   // Internet score (0-10 points)
-  if (latestReport.infrastructure.internetConnection === 'Fast') score += 10;
-  else if (latestReport.infrastructure.internetConnection === 'Medium') score += 7;
-  else if (latestReport.infrastructure.internetConnection === 'Slow') score += 3;
+  if (latestReport.infrastructure.internet_connection === 'Fast') score += 10;
+  else if (latestReport.infrastructure.internet_connection === 'Medium') score += 7;
+  else if (latestReport.infrastructure.internet_connection === 'Slow') score += 3;
   
   // Power backup (0-5 points)
-  if (latestReport.infrastructure.powerBackup) score += 5;
+  if (latestReport.infrastructure.power_backup) score += 5;
   
   // Usage score (0-25 points)
-  const teacherICTRatio = latestReport.usage.teachersUsingICT / latestReport.usage.totalTeachers;
+  const teacherICTRatio = latestReport.usage.teachers_using_ict / latestReport.usage.total_teachers;
   score += Math.min(10, Math.round(teacherICTRatio * 10)); // Max 10 points for teacher ICT usage
   
-  score += Math.min(5, Math.round(latestReport.usage.weeklyComputerLabHours / 10)); // Max 5 points for lab hours
+  score += Math.min(5, Math.round(latestReport.usage.weekly_computer_lab_hours / 10)); // Max 5 points for lab hours
   
-  score += Math.min(10, Math.round(latestReport.usage.studentDigitalLiteracyRate / 10)); // Max 10 points for literacy rate
+  score += Math.min(10, Math.round(latestReport.usage.student_digital_literacy_rate / 10)); // Max 10 points for literacy rate
   
   // Capacity score (0-20 points)
-  const teacherTrainingRatio = latestReport.capacity.ictTrainedTeachers / latestReport.usage.totalTeachers;
+  const teacherTrainingRatio = latestReport.capacity.ict_trained_teachers / latestReport.usage.total_teachers;
   score += Math.min(15, Math.round(teacherTrainingRatio * 15)); // Max 15 points for trained teachers
   
-  score += Math.min(5, latestReport.capacity.supportStaff * 2.5); // 2.5 points per support staff, max 5 points
+  // score += Math.min(5, latestReport.capacity.supportStaff * 2.5); // 2.5 points per support staff, max 5 points
 
   // Determine level based on score
   let level: 'Low' | 'Medium' | 'High';
@@ -63,7 +63,7 @@ export const calculateICTReadinessLevel = (reports: ICTReport[]): { level: 'Low'
  * @returns The latest ICT report for the school or undefined if none exists
  */
 export const getLatestReport = (schoolId: string, reports: ICTReport[]): ICTReport | undefined => {
-  const schoolReports = reports.filter(report => report.schoolId === schoolId);
+  const schoolReports = reports.filter(report => report.school_id === schoolId);
   if (schoolReports.length === 0) return undefined;
   
   return schoolReports.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
@@ -77,7 +77,7 @@ export const getLatestReport = (schoolId: string, reports: ICTReport[]): ICTRepo
  */
 export const getSchoolReports = (schoolId: string, reports: ICTReport[]): ICTReport[] => {
   return reports
-    .filter(report => report.schoolId === schoolId)
+    .filter(report => report.school_id === schoolId)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 };
 
@@ -109,7 +109,7 @@ export const calculateSummaryStats = (schools: School[], reports: ICTReport[]) =
     const report = latestReportsMap.get(school.id);
     
     // Internet access
-    if (report && report.infrastructure.internetConnection !== 'None') {
+    if (report && report.infrastructure.internet_connection !== 'None') {
       schoolsWithInternet++;
     }
     
@@ -119,7 +119,7 @@ export const calculateSummaryStats = (schools: School[], reports: ICTReport[]) =
     }
     
     // Readiness scores
-    const { score } = calculateICTReadinessLevel(reports.filter(r => r.schoolId === school.id));
+    const { score } = calculateICTReadinessLevel(reports.filter(r => r.school_id === school.id));
     schoolReadinessScores.push({
       schoolId: school.id,
       name: school.name,

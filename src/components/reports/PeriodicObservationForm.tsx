@@ -5,130 +5,29 @@ import PageHeader from '../common/PageHeader';
 import { 
   Save, 
   X, 
-  Calendar, 
-  User, 
-  Users, 
-  BookOpen, 
+  ArrowLeft, 
   Monitor, 
   Wifi, 
-  Zap,
+  Users, 
+  Battery, 
+  BookOpen, 
+  GraduationCap,
+  Settings,
+  Tablet,
+  Printer,
+  Projector,
+  Plus,
+  Minus,
+  AlertCircle,
   CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Camera,
-  FileText,
-  Award,
-  Star
+  Info
 } from 'lucide-react';
 
 interface PeriodicObservationFormProps {
   school: School;
   report?: ICTReport;
-  onSubmit: (report: ICTReport) => Promise<void>;
+  onSubmit: (report: ICTReport) => void;
   onCancel: () => void;
-}
-
-interface FormData {
-  // Section 1: School Snapshot
-  schoolName: string;
-  emisNumber: string;
-  termQuarter: string;
-  observationDate: string;
-  observerName: string;
-  observerContact: string;
-  weatherContext: string;
-
-  // Section 2: Enrollment & Attendance
-  totalEnrollment: number;
-  classAttendance: {
-    p6Registered: number;
-    p6Present: number;
-    p6Notes: string;
-    p7Registered: number;
-    p7Present: number;
-    p7Notes: string;
-  };
-  teacherAttendance: {
-    totalAssigned: number;
-    present: number;
-    absentTeachers: string;
-  };
-  dropouts: {
-    number: number;
-    maleDropouts: number;
-    femaleDropouts: number;
-    reasons: string;
-  };
-
-  // Section 3: Teaching & Learning
-  digitalSubjects: string;
-  lessonFrequency: 'Daily' | '2-3 times a week' | 'Once a week' | 'Rarely/Never';
-  teachersUsingDigital: string;
-  goodLessonObserved: string;
-  peerSupport: boolean;
-  learnersEngaged: boolean;
-  learnersUsingDevices: number;
-  engagementLevel: 'Low' | 'Moderate' | 'High';
-  challenges: string[];
-
-  // Section 4: Infrastructure & Device Status
-  devices: {
-    laptopsTotal: number;
-    laptopsWorking: number;
-    laptopsNotWorking: number;
-    laptopsNotes: string;
-    projectorTotal: number;
-    projectorWorking: number;
-    projectorNotWorking: number;
-    projectorNotes: string;
-    routerTotal: number;
-    routerWorking: number;
-    routerNotWorking: number;
-    routerNotes: string;
-    solarTotal: number;
-    solarWorking: number;
-    solarNotWorking: number;
-    solarNotes: string;
-  };
-  deviceStorage: boolean;
-  signInRegister: boolean;
-  powerAvailable: string[];
-
-  // Section 5: Internet & Content
-  internetStatus: 'Active and working' | 'Available but slow' | 'Not working' | 'Not available';
-  contentSources: string;
-  newContentIntroduced: boolean;
-  learnerAccessLevels: 'Shared' | 'Individual' | 'Group Work';
-
-  // Section 6: Management & Support
-  headTeacherInvolved: boolean;
-  ictCoordinator: boolean;
-  ictSchedule: boolean;
-  smcMeeting: boolean;
-  ictDiscussions: boolean;
-  communityEngagement: string[];
-
-  // Section 7: Issues & Recommendations
-  achievements: string;
-  infrastructureChallenges: string;
-  trainingChallenges: string;
-  connectivityChallenges: string;
-  contentChallenges: string;
-  otherChallenges: string;
-  immediateActions: string;
-  capacityBuildingNeeds: string;
-  supportRequests: string;
-
-  // Section 8: Observer's Scorecard
-  scores: {
-    learnerAttendance: number;
-    teacherAttendance: number;
-    digitalToolsUse: number;
-    infrastructureCondition: number;
-    internetAvailability: number;
-    managementSupport: number;
-  };
-  nextVisit: string;
 }
 
 const PeriodicObservationForm: React.FC<PeriodicObservationFormProps> = ({
@@ -137,1278 +36,681 @@ const PeriodicObservationForm: React.FC<PeriodicObservationFormProps> = ({
   onSubmit,
   onCancel
 }) => {
-  // Generate current month period (e.g., "JAN 2025")
-  const getCurrentPeriod = () => {
-    const now = new Date();
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    return `${months[now.getMonth()]} ${now.getFullYear()}`;
-  };
-
-  const [formData, setFormData] = useState<FormData>({
-    // Initialize with school data and existing report data if editing
-    schoolName: school.name,
-    emisNumber: school.emis_number || '',
-    termQuarter: report?.period || getCurrentPeriod(),
-    observationDate: report?.date || new Date().toISOString().split('T')[0],
-    observerName: '',
-    observerContact: '',
-    weatherContext: '',
-
-    totalEnrollment: school.total_enrollment,
-    classAttendance: {
-      p6Registered: 0,
-      p6Present: 0,
-      p6Notes: '',
-      p7Registered: 0,
-      p7Present: 0,
-      p7Notes: ''
+  const [formData, setFormData] = useState<Omit<ICTReport, 'id'>>({
+    schoolId: school.id,
+    date: report?.date ?? new Date().toISOString().split('T')[0],
+    period: report?.period || '',
+    infrastructure: {
+      computers: report?.infrastructure.computers || 0,
+      tablets: report?.infrastructure.tablets || 0,
+      projectors: report?.infrastructure.projectors || 0,
+      printers: report?.infrastructure.printers || 0,
+      internetConnection: report?.infrastructure.internet_connection || 'None',
+      internetSpeedMbps: report?.infrastructure.internet_speed_mbps || 0,
+      powerSource: report?.infrastructure.power_source || [],
+      powerBackup: report?.infrastructure.power_backup || false,
+      functionalDevices: report?.infrastructure.functional_devices || 0
     },
-    teacherAttendance: {
-      totalAssigned: school.total_teachers,
-      present: 0,
-      absentTeachers: ''
+    usage: {
+      teachersUsingICT: report?.usage.teachers_using_ict || 0,
+      totalTeachers: report?.usage.total_teachers || school?.total_teachers || 0,
+      weeklyComputerLabHours: report?.usage.weekly_computer_lab_hours || 0,
+      studentDigitalLiteracyRate: report?.usage.student_digital_literacy_rate || 0
     },
-    dropouts: {
-      number: 0,
-      maleDropouts: 0,
-      femaleDropouts: 0,
-      reasons: ''
+    software: {
+      operatingSystems: report?.software.operating_systems || [],
+      educationalSoftware: report?.software.educational_software || [],
+      officeApplications: report?.software.office_applications || false
     },
-
-    digitalSubjects: '',
-    lessonFrequency: 'Rarely/Never',
-    teachersUsingDigital: '',
-    goodLessonObserved: '',
-    peerSupport: false,
-    learnersEngaged: false,
-    learnersUsingDevices: 0,
-    engagementLevel: 'Low',
-    challenges: [],
-
-    devices: {
-      laptopsTotal: report?.infrastructure.computers || 0,
-      laptopsWorking: 0,
-      laptopsNotWorking: 0,
-      laptopsNotes: '',
-      projectorTotal: report?.infrastructure.projectors || 0,
-      projectorWorking: 0,
-      projectorNotWorking: 0,
-      projectorNotes: '',
-      routerTotal: 0,
-      routerWorking: 0,
-      routerNotWorking: 0,
-      routerNotes: '',
-      solarTotal: 0,
-      solarWorking: 0,
-      solarNotWorking: 0,
-      solarNotes: ''
-    },
-    deviceStorage: false,
-    signInRegister: false,
-    powerAvailable: [],
-
-    internetStatus: 'Not available',
-    contentSources: '',
-    newContentIntroduced: false,
-    learnerAccessLevels: 'Shared',
-
-    headTeacherInvolved: false,
-    ictCoordinator: false,
-    ictSchedule: false,
-    smcMeeting: false,
-    ictDiscussions: false,
-    communityEngagement: [],
-
-    achievements: '',
-    infrastructureChallenges: '',
-    trainingChallenges: '',
-    connectivityChallenges: '',
-    contentChallenges: '',
-    otherChallenges: '',
-    immediateActions: '',
-    capacityBuildingNeeds: '',
-    supportRequests: '',
-
-    scores: {
-      learnerAttendance: 3,
-      teacherAttendance: 3,
-      digitalToolsUse: 3,
-      infrastructureCondition: 3,
-      internetAvailability: 3,
-      managementSupport: 3
-    },
-    nextVisit: ''
+    capacity: {
+      ictTrainedTeachers: report?.capacity.ict_trained_teachers || 0,
+      supportStaff: report?.capacity.support_staff || 0
+    }
   });
 
-  const [currentSection, setCurrentSection] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [newOS, setNewOS] = useState('');
+  const [newSoftware, setNewSoftware] = useState('');
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  // Validation
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.period.trim()) {
+      newErrors.period = 'Period is required';
+    }
+
+    if (formData.usage.teachersUsingICT > formData.usage.totalTeachers) {
+      newErrors.teachersUsingICT = 'Cannot exceed total teachers';
+    }
+
+    if (formData.capacity.ictTrainedTeachers > formData.usage.totalTeachers) {
+      newErrors.ictTrainedTeachers = 'Cannot exceed total teachers';
+    }
+
+    if (formData.usage.studentDigitalLiteracyRate < 0 || formData.usage.studentDigitalLiteracyRate > 100) {
+      newErrors.studentDigitalLiteracyRate = 'Must be between 0 and 100';
+    }
+
+    if (formData.infrastructure.internetConnection !== 'None' && formData.infrastructure.internetSpeedMbps <= 0) {
+      newErrors.internetSpeedMbps = 'Speed must be greater than 0 for internet connections';
+    }
+
+    const totalDevices = formData.infrastructure.computers + formData.infrastructure.tablets + 
+                        formData.infrastructure.projectors + formData.infrastructure.printers;
+    if (formData.infrastructure.functionalDevices > totalDevices) {
+      newErrors.functionalDevices = 'Cannot exceed total devices';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleNestedInputChange = (section: string, field: string, value: any) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    const reportData: ICTReport = {
+      id: report?.id || null,
+      ...formData
+    };
+
+    // console.log("report data", reportData)
+
+    onSubmit(reportData);
+  };
+
+  const updateInfrastructure = (field: keyof typeof formData.infrastructure, value: any) => {
     setFormData(prev => ({
       ...prev,
-      [section]: {
-        ...prev[section as keyof FormData] as any,
+      infrastructure: {
+        ...prev.infrastructure,
         [field]: value
       }
     }));
   };
 
-  const handleArrayToggle = (field: string, value: string) => {
+  const updateUsage = (field: keyof typeof formData.usage, value: any) => {
     setFormData(prev => ({
       ...prev,
-      [field]: (prev[field as keyof FormData] as string[]).includes(value)
-        ? (prev[field as keyof FormData] as string[]).filter(item => item !== value)
-        : [...(prev[field as keyof FormData] as string[]), value]
+      usage: {
+        ...prev.usage,
+        [field]: value
+      }
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const updateSoftware = (field: keyof typeof formData.software, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      software: {
+        ...prev.software,
+        [field]: value
+      }
+    }));
+  };
 
-    try {
-      // Convert form data to ICTReport format
-      const reportData: ICTReport = {
-        id: report?.id || '',
-        schoolId: school.id,
-        date: formData.observationDate,
-        period: formData.termQuarter,
-        infrastructure: {
-          computers: formData.devices.laptopsTotal,
-          tablets: 0,
-          projectors: formData.devices.projectorTotal,
-          printers: 0,
-          internetConnection: formData.internetStatus === 'Active and working' ? 'Fast' :
-                            formData.internetStatus === 'Available but slow' ? 'Slow' : 'None',
-          internetSpeedMbps: formData.internetStatus === 'Active and working' ? 25 : 
-                            formData.internetStatus === 'Available but slow' ? 5 : 0,
-          powerSource: formData.powerAvailable.includes('Solar') ? ['Solar'] : ['NationalGrid'],
-          powerBackup: formData.powerAvailable.includes('Solar'),
-          functionalDevices: formData.devices.laptopsWorking + formData.devices.projectorWorking
-        },
-        usage: {
-          teachersUsingICT: Math.floor(formData.teacherAttendance.present * 0.8),
-          totalTeachers: formData.teacherAttendance.totalAssigned,
-          weeklyComputerLabHours: formData.lessonFrequency === 'Daily' ? 25 :
-                                 formData.lessonFrequency === '2-3 times a week' ? 15 :
-                                 formData.lessonFrequency === 'Once a week' ? 5 : 2,
-          studentDigitalLiteracyRate: formData.engagementLevel === 'High' ? 80 : 
-                                    formData.engagementLevel === 'Moderate' ? 50 : 20
-        },
-        software: {
-          operatingSystems: ['Windows 10'],
-          educationalSoftware: formData.contentSources ? [formData.contentSources] : [],
-          officeApplications: true
-        },
-        capacity: {
-          ictTrainedTeachers: Math.floor(formData.teacherAttendance.present * 0.7),
-          supportStaff: formData.ictCoordinator ? 1 : 0
-        }
-      };
+  const updateCapacity = (field: keyof typeof formData.capacity, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      capacity: {
+        ...prev.capacity,
+        [field]: value
+      }
+    }));
+  };
 
-      // console.log("original form data", formData);
-
-      await onSubmit(formData);
-    } catch (error) {
-      console.error('Error submitting observation:', error);
-    } finally {
-      setLoading(false);
+  const handlePowerSourceChange = (source: 'NationalGrid' | 'Solar' | 'Generator', checked: boolean) => {
+    const currentSources = formData.infrastructure.powerSource;
+    if (checked) {
+      updateInfrastructure('powerSource', [...currentSources, source]);
+    } else {
+      updateInfrastructure('powerSource', currentSources.filter(s => s !== source));
     }
   };
 
-  const sections = [
-    'School Snapshot',
-    'Enrollment & Attendance',
-    'Teaching & Learning',
-    'Infrastructure & Devices',
-    'Internet & Content',
-    'Management & Support',
-    'Issues & Recommendations',
-    'Observer\'s Scorecard'
-  ];
+  const addOperatingSystem = () => {
+    if (newOS.trim() && !formData.software.operatingSystems.includes(newOS.trim())) {
+      updateSoftware('operatingSystems', [...formData.software.operatingSystems, newOS.trim()]);
+      setNewOS('');
+    }
+  };
 
-  const ScoreInput = ({ label, value, onChange }: { label: string; value: number; onChange: (value: number) => void }) => (
-    <div className="form-group">
-      <label className="form-label">{label}</label>
-      <div className="flex items-center space-x-2">
-        {[1, 2, 3, 4, 5].map((score) => (
-          <button
-            key={score}
-            type="button"
-            onClick={() => onChange(score)}
-            className={`p-1 rounded ${value >= score ? 'text-yellow-400' : 'text-gray-300'}`}
-          >
-            <Star className="h-6 w-6 fill-current" />
-          </button>
-        ))}
-        <span className="text-sm text-gray-600 ml-2">{value}/5</span>
-      </div>
-    </div>
-  );
+  const removeOperatingSystem = (os: string) => {
+    updateSoftware('operatingSystems', formData.software.operatingSystems.filter(item => item !== os));
+  };
+
+  const addEducationalSoftware = () => {
+    if (newSoftware.trim() && !formData.software.educationalSoftware.includes(newSoftware.trim())) {
+      updateSoftware('educationalSoftware', [...formData.software.educationalSoftware, newSoftware.trim()]);
+      setNewSoftware('');
+    }
+  };
+
+  const removeEducationalSoftware = (software: string) => {
+    updateSoftware('educationalSoftware', formData.software.educationalSoftware.filter(item => item !== software));
+  };
+
+  // Calculate totals and percentages for display
+  const totalDevices = formData.infrastructure.computers + formData.infrastructure.tablets + 
+                      formData.infrastructure.projectors + formData.infrastructure.printers;
+  const teacherUsagePercent = formData.usage.totalTeachers > 0 ? 
+    Math.round((formData.usage.teachersUsingICT / formData.usage.totalTeachers) * 100) : 0;
+  const trainedTeachersPercent = formData.usage.totalTeachers > 0 ? 
+    Math.round((formData.capacity.ictTrainedTeachers / formData.usage.totalTeachers) * 100) : 0;
 
   return (
     <div>
       <PageHeader 
-        title="Periodic Observation Form"
-        description={`Recording routine monitoring and progress tracking for ${school.name}`}
+        title={report ? 'Edit Periodic Observation' : 'New Periodic Observation'}
+        description={`${school.name} - ${school.district}, ${school.environment}`}
         action={
-          <div className="space-x-2">
-            <button
-              onClick={onCancel}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-            >
-              <X className="mr-2 h-4 w-4" />
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {loading ? 'Saving...' : 'Save Observation'}
-            </button>
-          </div>
+          <button
+            onClick={onCancel}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to School
+          </button>
         }
       />
 
-      {/* Section Navigation */}
-      <div className="mb-6">
-        <nav className="flex space-x-1 bg-gray-100 rounded-lg p-1 overflow-x-auto">
-          {sections.map((section, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSection(index + 1)}
-              className={`flex-shrink-0 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                currentSection === index + 1
-                  ? 'bg-white text-blue-700 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              {index + 1}. {section}
-            </button>
-          ))}
-        </nav>
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Section 1: School Snapshot */}
-        {currentSection === 1 && (
-          <Card title="📌 Section 1: School Snapshot">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-group">
-                <label className="form-label">School Name</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={formData.schoolName}
-                  onChange={(e) => handleInputChange('schoolName', e.target.value)}
-                  readOnly
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">EMIS Number</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={formData.emisNumber}
-                  onChange={(e) => handleInputChange('emisNumber', e.target.value)}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Term/Quarter</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g., JAN 2025, FEB 2025"
-                  value={formData.termQuarter}
-                  onChange={(e) => handleInputChange('termQuarter', e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Observation Date</label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={formData.observationDate}
-                  onChange={(e) => handleInputChange('observationDate', e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Observer Name</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={formData.observerName}
-                  onChange={(e) => handleInputChange('observerName', e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Observer Contact</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Phone/Email"
-                  value={formData.observerContact}
-                  onChange={(e) => handleInputChange('observerContact', e.target.value)}
-                />
-              </div>
-
-              <div className="form-group md:col-span-2">
-                <label className="form-label">General Weather/Environment Context on Visit</label>
-                <textarea
-                  className="form-input"
-                  rows={3}
-                  placeholder="Optional but useful for context, especially in rural schools"
-                  value={formData.weatherContext}
-                  onChange={(e) => handleInputChange('weatherContext', e.target.value)}
-                />
-              </div>
+        {/* Basic Information */}
+        <Card title="Observation Details">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="form-label">
+                Observation Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                className="form-input"
+                value={formData.date}
+                onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                required
+              />
             </div>
-          </Card>
-        )}
-
-        {/* Section 2: Enrollment & Attendance */}
-        {currentSection === 2 && (
-          <Card title="📌 Section 2: Enrollment & Attendance Tracking">
-            <div className="space-y-6">
-              <div className="form-group">
-                <label className="form-label">Total Learner Enrollment This Term (P1–P7)</label>
-                <input
-                  type="number"
-                  className="form-input"
-                  value={formData.totalEnrollment}
-                  onChange={(e) => handleInputChange('totalEnrollment', parseInt(e.target.value))}
-                />
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Class-by-Class Learner Attendance Today</h4>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Registered</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Present</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">P6</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="number"
-                            className="form-input w-20"
-                            value={formData.classAttendance.p6Registered}
-                            onChange={(e) => handleNestedInputChange('classAttendance', 'p6Registered', parseInt(e.target.value))}
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="number"
-                            className="form-input w-20"
-                            value={formData.classAttendance.p6Present}
-                            onChange={(e) => handleNestedInputChange('classAttendance', 'p6Present', parseInt(e.target.value))}
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="text"
-                            className="form-input"
-                            value={formData.classAttendance.p6Notes}
-                            onChange={(e) => handleNestedInputChange('classAttendance', 'p6Notes', e.target.value)}
-                          />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">P7</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="number"
-                            className="form-input w-20"
-                            value={formData.classAttendance.p7Registered}
-                            onChange={(e) => handleNestedInputChange('classAttendance', 'p7Registered', parseInt(e.target.value))}
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="number"
-                            className="form-input w-20"
-                            value={formData.classAttendance.p7Present}
-                            onChange={(e) => handleNestedInputChange('classAttendance', 'p7Present', parseInt(e.target.value))}
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="text"
-                            className="form-input"
-                            value={formData.classAttendance.p7Notes}
-                            onChange={(e) => handleNestedInputChange('classAttendance', 'p7Notes', e.target.value)}
-                          />
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Teacher Attendance Today</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="form-group">
-                    <label className="form-label">Total Teachers Assigned</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={formData.teacherAttendance.totalAssigned}
-                      onChange={(e) => handleNestedInputChange('teacherAttendance', 'totalAssigned', parseInt(e.target.value))}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Teachers Present</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={formData.teacherAttendance.present}
-                      onChange={(e) => handleNestedInputChange('teacherAttendance', 'present', parseInt(e.target.value))}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Absent Teachers (Name & Reason)</label>
-                    <textarea
-                      className="form-input"
-                      rows={2}
-                      value={formData.teacherAttendance.absentTeachers}
-                      onChange={(e) => handleNestedInputChange('teacherAttendance', 'absentTeachers', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Notable Dropouts or Transfers</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="form-group">
-                    <label className="form-label">Number of Dropouts</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={formData.dropouts.number}
-                      onChange={(e) => handleNestedInputChange('dropouts', 'number', parseInt(e.target.value))}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Gender Breakdown (Male/Female)</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="number"
-                        className="form-input"
-                        placeholder="Male"
-                        value={formData.dropouts.maleDropouts}
-                        onChange={(e) => handleNestedInputChange('dropouts', 'maleDropouts', parseInt(e.target.value))}
-                      />
-                      <input
-                        type="number"
-                        className="form-input"
-                        placeholder="Female"
-                        value={formData.dropouts.femaleDropouts}
-                        onChange={(e) => handleNestedInputChange('dropouts', 'femaleDropouts', parseInt(e.target.value))}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group md:col-span-2">
-                    <label className="form-label">Possible Reasons</label>
-                    <textarea
-                      className="form-input"
-                      rows={3}
-                      value={formData.dropouts.reasons}
-                      onChange={(e) => handleNestedInputChange('dropouts', 'reasons', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
+            
+            <div>
+              <label className="form-label">
+                Period <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className={`form-input ${errors.period ? 'border-red-500' : ''}`}
+                placeholder="e.g., Jan 2024, Q1 2024"
+                value={formData.period}
+                onChange={(e) => setFormData(prev => ({ ...prev, period: e.target.value }))}
+                required
+              />
+              {errors.period && <p className="form-error">{errors.period}</p>}
             </div>
-          </Card>
-        )}
+          </div>
+        </Card>
 
-        {/* Section 3: Teaching & Learning */}
-        {currentSection === 3 && (
-          <Card title="📌 Section 3: Teaching & Learning Activity">
-            <div className="space-y-6">
-              <div className="form-group">
-                <label className="form-label">Subjects Taught Using Digital Tools This Term</label>
-                <textarea
-                  className="form-input"
-                  rows={3}
-                  placeholder="List subject and class e.g., 'P6 English, P5 Science'"
-                  value={formData.digitalSubjects}
-                  onChange={(e) => handleInputChange('digitalSubjects', e.target.value)}
-                />
-              </div>
+        {/* Infrastructure Section */}
+        <Card>
+          <div className="flex items-center mb-6">
+            <div className="p-2 bg-blue-100 rounded-lg mr-3">
+              <Monitor className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">Infrastructure & Devices</h3>
+              <p className="text-sm text-gray-500">Record the current status of ICT infrastructure</p>
+            </div>
+          </div>
 
-              <div className="form-group">
-                <label className="form-label">Digital Lesson Frequency</label>
-                <select
-                  className="form-select"
-                  value={formData.lessonFrequency}
-                  onChange={(e) => handleInputChange('lessonFrequency', e.target.value)}
-                >
-                  <option value="Daily">Daily</option>
-                  <option value="2-3 times a week">2–3 times a week</option>
-                  <option value="Once a week">Once a week</option>
-                  <option value="Rarely/Never">Rarely/Never</option>
-                </select>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Teacher Observations</h4>
-                <div className="space-y-4">
-                  <div className="form-group">
-                    <label className="form-label">Teachers actively using digital content (Names)</label>
-                    <textarea
-                      className="form-input"
-                      rows={2}
-                      value={formData.teachersUsingDigital}
-                      onChange={(e) => handleInputChange('teachersUsingDigital', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Good lesson observed using digital resources</label>
-                    <textarea
-                      className="form-input"
-                      rows={3}
-                      placeholder="Describe briefly"
-                      value={formData.goodLessonObserved}
-                      onChange={(e) => handleInputChange('goodLessonObserved', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Peer support or internal mentoring visible</label>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="peerSupport"
-                          checked={formData.peerSupport === true}
-                          onChange={() => handleInputChange('peerSupport', true)}
-                        />
-                        <span className="ml-2">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="peerSupport"
-                          checked={formData.peerSupport === false}
-                          onChange={() => handleInputChange('peerSupport', false)}
-                        />
-                        <span className="ml-2">No</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Learner Observations</h4>
-                <div className="space-y-4">
-                  <div className="form-group">
-                    <label className="form-label">Learners engaged with digital content</label>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="learnersEngaged"
-                          checked={formData.learnersEngaged === true}
-                          onChange={() => handleInputChange('learnersEngaged', true)}
-                        />
-                        <span className="ml-2">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="learnersEngaged"
-                          checked={formData.learnersEngaged === false}
-                          onChange={() => handleInputChange('learnersEngaged', false)}
-                        />
-                        <span className="ml-2">No</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Number of Learners using devices today</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={formData.learnersUsingDevices}
-                      onChange={(e) => handleInputChange('learnersUsingDevices', parseInt(e.target.value))}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Level of engagement</label>
-                    <select
-                      className="form-select"
-                      value={formData.engagementLevel}
-                      onChange={(e) => handleInputChange('engagementLevel', e.target.value)}
-                    >
-                      <option value="Low">Low</option>
-                      <option value="Moderate">Moderate</option>
-                      <option value="High">High</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Challenges in Digital Teaching</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {[
-                    'Power',
-                    'Devices not working',
-                    'No content',
-                    'Lack of confidence',
-                    'Internet',
-                    'Time constraints'
-                  ].map((challenge) => (
-                    <label key={challenge} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox"
-                        checked={formData.challenges.includes(challenge)}
-                        onChange={() => handleArrayToggle('challenges', challenge)}
-                      />
-                      <span className="ml-2 text-sm">{challenge}</span>
-                    </label>
-                  ))}
-                </div>
-                <div className="mt-4">
+          <div className="space-y-6">
+            {/* Device Counts */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-4">Device Inventory</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="form-label">
+                    <Monitor className="inline h-4 w-4 mr-1" />
+                    Computers
+                  </label>
                   <input
-                    type="text"
+                    type="number"
+                    min="0"
                     className="form-input"
-                    placeholder="Other challenges..."
-                    onBlur={(e) => {
-                      if (e.target.value && !formData.challenges.includes(e.target.value)) {
-                        handleArrayToggle('challenges', e.target.value);
-                        e.target.value = '';
-                      }
-                    }}
+                    value={formData.infrastructure.computers}
+                    onChange={(e) => updateInfrastructure('computers', parseInt(e.target.value) || 0)}
+                  />
+                </div>
+                
+                <div>
+                  <label className="form-label">
+                    <Tablet className="inline h-4 w-4 mr-1" />
+                    Tablets
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="form-input"
+                    value={formData.infrastructure.tablets}
+                    onChange={(e) => updateInfrastructure('tablets', parseInt(e.target.value) || 0)}
+                  />
+                </div>
+                
+                <div>
+                  <label className="form-label">
+                    <Projector className="inline h-4 w-4 mr-1" />
+                    Projectors
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="form-input"
+                    value={formData.infrastructure.projectors}
+                    onChange={(e) => updateInfrastructure('projectors', parseInt(e.target.value) || 0)}
+                  />
+                </div>
+                
+                <div>
+                  <label className="form-label">
+                    <Printer className="inline h-4 w-4 mr-1" />
+                    Printers
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="form-input"
+                    value={formData.infrastructure.printers}
+                    onChange={(e) => updateInfrastructure('printers', parseInt(e.target.value) || 0)}
                   />
                 </div>
               </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Section 4: Infrastructure & Device Status */}
-        {currentSection === 4 && (
-          <Card title="📌 Section 4: Infrastructure & Device Status">
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Digital Devices Available</h4>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Device</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Working</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Not Working</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {[
-                        { key: 'laptops', label: 'Laptops/Tablets' },
-                        { key: 'projector', label: 'Projector' },
-                        { key: 'router', label: 'Router/Modem' },
-                        { key: 'solar', label: 'Solar Setup' }
-                      ].map((device) => (
-                        <tr key={device.key}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {device.label}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <input
-                              type="number"
-                              className="form-input w-20"
-                              value={formData.devices[`${device.key}Total` as keyof typeof formData.devices]}
-                              onChange={(e) => handleNestedInputChange('devices', `${device.key}Total`, parseInt(e.target.value))}
-                            />
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <input
-                              type="number"
-                              className="form-input w-20"
-                              value={formData.devices[`${device.key}Working` as keyof typeof formData.devices]}
-                              onChange={(e) => handleNestedInputChange('devices', `${device.key}Working`, parseInt(e.target.value))}
-                            />
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <input
-                              type="number"
-                              className="form-input w-20"
-                              value={formData.devices[`${device.key}NotWorking` as keyof typeof formData.devices]}
-                              onChange={(e) => handleNestedInputChange('devices', `${device.key}NotWorking`, parseInt(e.target.value))}
-                            />
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <input
-                              type="text"
-                              className="form-input"
-                              value={formData.devices[`${device.key}Notes` as keyof typeof formData.devices]}
-                              onChange={(e) => handleNestedInputChange('devices', `${device.key}Notes`, e.target.value)}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Device Storage & Security</h4>
-                <div className="space-y-4">
-                  <div className="form-group">
-                    <label className="form-label">Devices properly stored/locked</label>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="deviceStorage"
-                          checked={formData.deviceStorage === true}
-                          onChange={() => handleInputChange('deviceStorage', true)}
-                        />
-                        <span className="ml-2">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="deviceStorage"
-                          checked={formData.deviceStorage === false}
-                          onChange={() => handleInputChange('deviceStorage', false)}
-                        />
-                        <span className="ml-2">No</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Sign-in/checkout register maintained</label>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="signInRegister"
-                          checked={formData.signInRegister === true}
-                          onChange={() => handleInputChange('signInRegister', true)}
-                        />
-                        <span className="ml-2">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="signInRegister"
-                          checked={formData.signInRegister === false}
-                          onChange={() => handleInputChange('signInRegister', false)}
-                        />
-                        <span className="ml-2">No</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Power Availability During Visit</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {['Grid', 'Solar', 'Power not available today'].map((power) => (
-                    <label key={power} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox"
-                        checked={formData.powerAvailable.includes(power)}
-                        onChange={() => handleArrayToggle('powerAvailable', power)}
-                      />
-                      <span className="ml-2 text-sm">{power}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Section 5: Internet & Content */}
-        {currentSection === 5 && (
-          <Card title="📌 Section 5: Internet & Content">
-            <div className="space-y-6">
-              <div className="form-group">
-                <label className="form-label">Internet Status During Visit</label>
-                <select
-                  className="form-select"
-                  value={formData.internetStatus}
-                  onChange={(e) => handleInputChange('internetStatus', e.target.value)}
-                >
-                  <option value="Active and working">Active and working</option>
-                  <option value="Available but slow">Available but slow</option>
-                  <option value="Not working">Not working</option>
-                  <option value="Not available">Not available</option>
-                </select>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Digital Content Usage This Term</h4>
-                <div className="space-y-4">
-                  <div className="form-group">
-                    <label className="form-label">Content sources used (Kolibri, LMS, Local Videos, etc.)</label>
-                    <textarea
-                      className="form-input"
-                      rows={3}
-                      value={formData.contentSources}
-                      onChange={(e) => handleInputChange('contentSources', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Any new content introduced?</label>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="newContentIntroduced"
-                          checked={formData.newContentIntroduced === true}
-                          onChange={() => handleInputChange('newContentIntroduced', true)}
-                        />
-                        <span className="ml-2">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="newContentIntroduced"
-                          checked={formData.newContentIntroduced === false}
-                          onChange={() => handleInputChange('newContentIntroduced', false)}
-                        />
-                        <span className="ml-2">No</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Learner access levels</label>
-                    <select
-                      className="form-select"
-                      value={formData.learnerAccessLevels}
-                      onChange={(e) => handleInputChange('learnerAccessLevels', e.target.value)}
-                    >
-                      <option value="Shared">Shared</option>
-                      <option value="Individual">Individual</option>
-                      <option value="Group Work">Group Work</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Section 6: Management & Support */}
-        {currentSection === 6 && (
-          <Card title="📌 Section 6: Management, Support & Community Involvement">
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">School Leadership Support for Digital Learning</h4>
-                <div className="space-y-4">
-                  <div className="form-group">
-                    <label className="form-label">Head Teacher personally involved?</label>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="headTeacherInvolved"
-                          checked={formData.headTeacherInvolved === true}
-                          onChange={() => handleInputChange('headTeacherInvolved', true)}
-                        />
-                        <span className="ml-2">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="headTeacherInvolved"
-                          checked={formData.headTeacherInvolved === false}
-                          onChange={() => handleInputChange('headTeacherInvolved', false)}
-                        />
-                        <span className="ml-2">No</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">ICT Coordinator appointed?</label>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="ictCoordinator"
-                          checked={formData.ictCoordinator === true}
-                          onChange={() => handleInputChange('ictCoordinator', true)}
-                        />
-                        <span className="ml-2">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="ictCoordinator"
-                          checked={formData.ictCoordinator === false}
-                          onChange={() => handleInputChange('ictCoordinator', false)}
-                        />
-                        <span className="ml-2">No</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">ICT Schedule/Timetable developed?</label>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="ictSchedule"
-                          checked={formData.ictSchedule === true}
-                          onChange={() => handleInputChange('ictSchedule', true)}
-                        />
-                        <span className="ml-2">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="ictSchedule"
-                          checked={formData.ictSchedule === false}
-                          onChange={() => handleInputChange('ictSchedule', false)}
-                        />
-                        <span className="ml-2">No</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">SMC or PTA Meeting Held This Term?</h4>
-                <div className="space-y-4">
-                  <div className="form-group">
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="smcMeeting"
-                          checked={formData.smcMeeting === true}
-                          onChange={() => handleInputChange('smcMeeting', true)}
-                        />
-                        <span className="ml-2">Yes</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio"
-                          name="smcMeeting"
-                          checked={formData.smcMeeting === false}
-                          onChange={() => handleInputChange('smcMeeting', false)}
-                        />
-                        <span className="ml-2">No</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {formData.smcMeeting && (
-                    <div className="form-group">
-                      <label className="form-label">Did it address ICT-related discussions?</label>
-                      <div className="flex items-center space-x-4">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            className="form-radio"
-                            name="ictDiscussions"
-                            checked={formData.ictDiscussions === true}
-                            onChange={() => handleInputChange('ictDiscussions', true)}
-                          />
-                          <span className="ml-2">Yes</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            className="form-radio"
-                            name="ictDiscussions"
-                            checked={formData.ictDiscussions === false}
-                            onChange={() => handleInputChange('ictDiscussions', false)}
-                          />
-                          <span className="ml-2">No</span>
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Community Engagement Observed</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    'Parents/Guardians visited school',
-                    'Local Leaders involved',
-                    'NGO/Partner engagement noted'
-                  ].map((engagement) => (
-                    <label key={engagement} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox"
-                        checked={formData.communityEngagement.includes(engagement)}
-                        onChange={() => handleArrayToggle('communityEngagement', engagement)}
-                      />
-                      <span className="ml-2 text-sm">{engagement}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Section 7: Issues & Recommendations */}
-        {currentSection === 7 && (
-          <Card title="📌 Section 7: Issues, Recommendations, and Progress">
-            <div className="space-y-6">
-              <div className="form-group">
-                <label className="form-label">Main Achievements This Term</label>
-                <textarea
-                  className="form-input"
-                  rows={3}
-                  placeholder="E.g., 'All P5 teachers using tablets,' 'Reliable solar installed,' etc."
-                  value={formData.achievements}
-                  onChange={(e) => handleInputChange('achievements', e.target.value)}
-                />
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Ongoing Challenges</h4>
-                <div className="space-y-4">
-                  <div className="form-group">
-                    <label className="form-label">Infrastructure</label>
-                    <textarea
-                      className="form-input"
-                      rows={2}
-                      value={formData.infrastructureChallenges}
-                      onChange={(e) => handleInputChange('infrastructureChallenges', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Training</label>
-                    <textarea
-                      className="form-input"
-                      rows={2}
-                      value={formData.trainingChallenges}
-                      onChange={(e) => handleInputChange('trainingChallenges', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Connectivity</label>
-                    <textarea
-                      className="form-input"
-                      rows={2}
-                      value={formData.connectivityChallenges}
-                      onChange={(e) => handleInputChange('connectivityChallenges', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Content</label>
-                    <textarea
-                      className="form-input"
-                      rows={2}
-                      value={formData.contentChallenges}
-                      onChange={(e) => handleInputChange('contentChallenges', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Other</label>
-                    <textarea
-                      className="form-input"
-                      rows={2}
-                      value={formData.otherChallenges}
-                      onChange={(e) => handleInputChange('otherChallenges', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Recommendations</h4>
-                <div className="space-y-4">
-                  <div className="form-group">
-                    <label className="form-label">Immediate actions</label>
-                    <textarea
-                      className="form-input"
-                      rows={3}
-                      value={formData.immediateActions}
-                      onChange={(e) => handleInputChange('immediateActions', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Capacity building needs</label>
-                    <textarea
-                      className="form-input"
-                      rows={3}
-                      value={formData.capacityBuildingNeeds}
-                      onChange={(e) => handleInputChange('capacityBuildingNeeds', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Support requests to HQ/MoES/Partners</label>
-                    <textarea
-                      className="form-input"
-                      rows={3}
-                      value={formData.supportRequests}
-                      onChange={(e) => handleInputChange('supportRequests', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Section 8: Observer's Scorecard */}
-        {currentSection === 8 && (
-          <Card title="📌 Section 8: Observer's Scorecard">
-            <div className="space-y-6">
-              <p className="text-sm text-gray-600">Rate each indicator on a scale of 1-5 (1 = Poor, 5 = Excellent)</p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <ScoreInput
-                  label="Learner Attendance"
-                  value={formData.scores.learnerAttendance}
-                  onChange={(value) => handleNestedInputChange('scores', 'learnerAttendance', value)}
-                />
-
-                <ScoreInput
-                  label="Teacher Attendance"
-                  value={formData.scores.teacherAttendance}
-                  onChange={(value) => handleNestedInputChange('scores', 'teacherAttendance', value)}
-                />
-
-                <ScoreInput
-                  label="Use of Digital Tools"
-                  value={formData.scores.digitalToolsUse}
-                  onChange={(value) => handleNestedInputChange('scores', 'digitalToolsUse', value)}
-                />
-
-                <ScoreInput
-                  label="Infrastructure Condition"
-                  value={formData.scores.infrastructureCondition}
-                  onChange={(value) => handleNestedInputChange('scores', 'infrastructureCondition', value)}
-                />
-
-                <ScoreInput
-                  label="Internet Availability"
-                  value={formData.scores.internetAvailability}
-                  onChange={(value) => handleNestedInputChange('scores', 'internetAvailability', value)}
-                />
-
-                <ScoreInput
-                  label="Management Support for ICT"
-                  value={formData.scores.managementSupport}
-                  onChange={(value) => handleNestedInputChange('scores', 'managementSupport', value)}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Next Planned Visit</label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={formData.nextVisit}
-                  onChange={(e) => handleInputChange('nextVisit', e.target.value)}
-                />
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <div className="flex justify-between text-sm">
+                  <span>Total Devices:</span>
+                  <span className="font-medium">{totalDevices}</span>
+                </div>
               </div>
             </div>
-          </Card>
-        )}
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between">
+            {/* Functional Devices */}
+            <div>
+              <label className="form-label">
+                Functional Devices <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                max={totalDevices}
+                className={`form-input ${errors.functionalDevices ? 'border-red-500' : ''}`}
+                value={formData.infrastructure.functionalDevices}
+                onChange={(e) => updateInfrastructure('functionalDevices', parseInt(e.target.value) || 0)}
+                required
+              />
+              <p className="form-hint">Number of devices that are currently working (max: {totalDevices})</p>
+              {errors.functionalDevices && <p className="form-error">{errors.functionalDevices}</p>}
+            </div>
+
+            {/* Internet Connectivity */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-4">Internet Connectivity</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="form-label">
+                    <Wifi className="inline h-4 w-4 mr-1" />
+                    Connection Type
+                  </label>
+                  <select
+                    className="form-select"
+                    value={formData.infrastructure.internetConnection}
+                    onChange={(e) => updateInfrastructure('internetConnection', e.target.value as any)}
+                  >
+                    <option value="None">No Internet</option>
+                    <option value="Slow">Slow (1-5 Mbps)</option>
+                    <option value="Medium">Medium (6-20 Mbps)</option>
+                    <option value="Fast">Fast (21+ Mbps)</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="form-label">Internet Speed (Mbps)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    className={`form-input ${errors.internetSpeedMbps ? 'border-red-500' : ''}`}
+                    value={formData.infrastructure.internetSpeedMbps}
+                    onChange={(e) => updateInfrastructure('internetSpeedMbps', parseFloat(e.target.value) || 0)}
+                    disabled={formData.infrastructure.internetConnection === 'None'}
+                  />
+                  {errors.internetSpeedMbps && <p className="form-error">{errors.internetSpeedMbps}</p>}
+                </div>
+              </div>
+            </div>
+
+            {/* Power Sources */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-4">Power Infrastructure</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="form-label">Power Sources (select all that apply)</label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+                    {(['NationalGrid', 'Solar', 'Generator'] as const).map((source) => (
+                      <label key={source} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          className="form-checkbox"
+                          checked={formData.infrastructure.powerSource.includes(source)}
+                          onChange={(e) => handlePowerSourceChange(source, e.target.checked)}
+                        />
+                        <span className="ml-2 text-sm text-gray-700">
+                          {source === 'NationalGrid' ? 'National Grid' : source}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      className="form-checkbox"
+                      checked={formData.infrastructure.powerBackup}
+                      onChange={(e) => updateInfrastructure('powerBackup', e.target.checked)}
+                    />
+                    <span className="ml-2 text-sm text-gray-700">
+                      <Battery className="inline h-4 w-4 mr-1" />
+                      Has Power Backup System
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Teaching & Learning Section */}
+        <Card>
+          <div className="flex items-center mb-6">
+            <div className="p-2 bg-green-100 rounded-lg mr-3">
+              <BookOpen className="h-6 w-6 text-green-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">Teaching & Learning Activity</h3>
+              <p className="text-sm text-gray-500">Record ICT usage in teaching and learning</p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {/* Teacher Usage */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="form-label">
+                  <Users className="inline h-4 w-4 mr-1" />
+                  Total Teachers <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  className="form-input"
+                  value={formData.usage.totalTeachers}
+                  onChange={(e) => updateUsage('totalTeachers', parseInt(e.target.value) || 0)}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="form-label">
+                  Teachers Using ICT <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max={formData.usage.totalTeachers}
+                  className={`form-input ${errors.teachersUsingICT ? 'border-red-500' : ''}`}
+                  value={formData.usage.teachersUsingICT}
+                  onChange={(e) => updateUsage('teachersUsingICT', parseInt(e.target.value) || 0)}
+                  required
+                />
+                <p className="form-hint">Usage rate: {teacherUsagePercent}%</p>
+                {errors.teachersUsingICT && <p className="form-error">{errors.teachersUsingICT}</p>}
+              </div>
+            </div>
+
+            {/* Student Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="form-label">
+                  Weekly Computer Lab Hours
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-input"
+                  value={formData.usage.weeklyComputerLabHours}
+                  onChange={(e) => updateUsage('weeklyComputerLabHours', parseInt(e.target.value) || 0)}
+                />
+                <p className="form-hint">Total hours per week students use computer lab</p>
+              </div>
+              
+              <div>
+                <label className="form-label">
+                  <GraduationCap className="inline h-4 w-4 mr-1" />
+                  Student Digital Literacy Rate (%)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  className={`form-input ${errors.studentDigitalLiteracyRate ? 'border-red-500' : ''}`}
+                  value={formData.usage.studentDigitalLiteracyRate}
+                  onChange={(e) => updateUsage('studentDigitalLiteracyRate', parseFloat(e.target.value) || 0)}
+                />
+                <p className="form-hint">Percentage of students with basic digital skills</p>
+                {errors.studentDigitalLiteracyRate && <p className="form-error">{errors.studentDigitalLiteracyRate}</p>}
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Human Capacity Section */}
+        <Card>
+          <div className="flex items-center mb-6">
+            <div className="p-2 bg-purple-100 rounded-lg mr-3">
+              <Users className="h-6 w-6 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">Human Capacity</h3>
+              <p className="text-sm text-gray-500">Record ICT training and support staff</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="form-label">
+                ICT-Trained Teachers
+              </label>
+              <input
+                type="number"
+                min="0"
+                max={formData.usage.totalTeachers}
+                className={`form-input ${errors.ictTrainedTeachers ? 'border-red-500' : ''}`}
+                value={formData.capacity.ictTrainedTeachers}
+                onChange={(e) => updateCapacity('ictTrainedTeachers', parseInt(e.target.value) || 0)}
+              />
+              <p className="form-hint">Training rate: {trainedTeachersPercent}%</p>
+              {errors.ictTrainedTeachers && <p className="form-error">{errors.ictTrainedTeachers}</p>}
+            </div>
+            
+            <div>
+              <label className="form-label">
+                <Settings className="inline h-4 w-4 mr-1" />
+                ICT Support Staff
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-input"
+                value={formData.capacity.supportStaff}
+                onChange={(e) => updateCapacity('supportStaff', parseInt(e.target.value) || 0)}
+              />
+              <p className="form-hint">Dedicated ICT support personnel</p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Software & Content Section */}
+        <Card>
+          <div className="flex items-center mb-6">
+            <div className="p-2 bg-amber-100 rounded-lg mr-3">
+              <Settings className="h-6 w-6 text-amber-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">Software & Content</h3>
+              <p className="text-sm text-gray-500">Record available software and digital content</p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {/* Operating Systems */}
+            <div>
+              <label className="form-label">Operating Systems</label>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    className="form-input flex-1"
+                    placeholder="e.g., Windows 10, Ubuntu, macOS"
+                    value={newOS}
+                    onChange={(e) => setNewOS(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addOperatingSystem())}
+                  />
+                  <button
+                    type="button"
+                    onClick={addOperatingSystem}
+                    className="btn-secondary"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  {formData.software.operatingSystems.map((os) => (
+                    <span key={os} className="tag-blue flex items-center">
+                      {os}
+                      <button
+                        type="button"
+                        onClick={() => removeOperatingSystem(os)}
+                        className="ml-1 text-blue-600 hover:text-blue-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Educational Software */}
+            <div>
+              <label className="form-label">Educational Software</label>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    className="form-input flex-1"
+                    placeholder="e.g., Math Learning App, Language Lab Software"
+                    value={newSoftware}
+                    onChange={(e) => setNewSoftware(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addEducationalSoftware())}
+                  />
+                  <button
+                    type="button"
+                    onClick={addEducationalSoftware}
+                    className="btn-secondary"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  {formData.software.educationalSoftware.map((software) => (
+                    <span key={software} className="tag-green flex items-center">
+                      {software}
+                      <button
+                        type="button"
+                        onClick={() => removeEducationalSoftware(software)}
+                        className="ml-1 text-green-600 hover:text-green-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Office Applications */}
+            <div>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="form-checkbox"
+                  checked={formData.software.officeApplications}
+                  onChange={(e) => updateSoftware('officeApplications', e.target.checked)}
+                />
+                <span className="ml-2 text-sm text-gray-700">
+                  Office Applications Available (Word, Excel, PowerPoint, etc.)
+                </span>
+              </label>
+            </div>
+          </div>
+        </Card>
+
+        {/* Summary Card */}
+        <Card title="Observation Summary">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{formData.infrastructure.functionalDevices}</div>
+              <div className="text-sm text-blue-700">Functional Devices</div>
+            </div>
+            
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">{teacherUsagePercent}%</div>
+              <div className="text-sm text-green-700">Teacher ICT Usage</div>
+            </div>
+            
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">{formData.usage.studentDigitalLiteracyRate}%</div>
+              <div className="text-sm text-purple-700">Student Literacy</div>
+            </div>
+            
+            <div className="text-center p-4 bg-amber-50 rounded-lg">
+              <div className="text-2xl font-bold text-amber-600">{trainedTeachersPercent}%</div>
+              <div className="text-sm text-amber-700">Trained Teachers</div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Form Actions */}
+        <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
           <button
             type="button"
-            onClick={() => setCurrentSection(Math.max(1, currentSection - 1))}
-            disabled={currentSection === 1}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            onClick={onCancel}
+            className="btn-secondary"
           >
-            Previous
+            <X className="mr-2 h-4 w-4" />
+            Cancel
           </button>
-
-          {currentSection < sections.length ? (
-            <button
-              type="button"
-              onClick={() => setCurrentSection(Math.min(sections.length, currentSection + 1))}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={loading}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {loading ? 'Saving...' : 'Submit Observation'}
-            </button>
-          )}
+          <button
+            type="submit"
+            className="btn-primary"
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {report ? 'Update Observation' : 'Save Observation'}
+          </button>
         </div>
       </form>
     </div>

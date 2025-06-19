@@ -76,6 +76,12 @@ type TabType = 'overview' | 'infrastructure' | 'connectivity' | 'governance' | '
 
 const REPORTS_PER_PAGE = 5;
 
+const formatter = new Intl.DateTimeFormat('en-UG', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
 const SchoolDetail: React.FC<SchoolDetailProps> = ({ 
   school, 
   reports, 
@@ -115,9 +121,9 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
   };
 
   const handleReportSubmit = async (reportData: ICTReport) => {
-    console.log("report data", reportData)
-    // await onUpdateReport(reportData);
-    // setEditingReport(null);
+    // console.log("report data", reportData)
+    await onUpdateReport(reportData);
+    setEditingReport(null);
   };
 
   const handleCancelEdit = () => {
@@ -126,14 +132,14 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
 
   // Prepare data for trends
   const trendData = reports.map(report => ({
-    period: report.period,
-    computers: report.infrastructure.computers,
-    functionalDevices: report.infrastructure.functionalDevices,
-    internetSpeed: report.infrastructure.internetSpeedMbps,
-    teacherUsage: (report.usage.teachersUsingICT / report.usage.totalTeachers) * 100,
-    studentLiteracy: report.usage.studentDigitalLiteracyRate,
-    trainedTeachers: (report.capacity.ictTrainedTeachers / report.usage.totalTeachers) * 100,
-    weeklyLabHours: report.usage.weeklyComputerLabHours,
+    period: report?.period,
+    computers: report?.infrastructure.computers,
+    functionalDevices: report?.infrastructure.functional_devices,
+    internetSpeed: report.infrastructure.internet_speed_mbps,
+    teacherUsage: (report?.usage?.teachers_using_ict / report?.usage?.total_teachers) * 100,
+    studentLiteracy: report?.usage?.student_digital_literacy_rate,
+    trainedTeachers: (report?.capacity.ict_trained_teachers / report?.usage?.total_teachers) * 100,
+    weeklyLabHours: report.usage.weekly_computer_lab_hours,
     readinessScore: calculateICTReadinessLevel([report]).score
   }));
 
@@ -142,36 +148,36 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
 
   // Prepare infrastructure comparison data
   const infrastructureComparisonData = reports.map(report => ({
-    period: report.period,
-    computers: report.infrastructure.computers,
-    tablets: report.infrastructure.tablets,
-    projectors: report.infrastructure.projectors,
-    printers: report.infrastructure.printers
+    period: report?.period,
+    computers: report?.infrastructure.computers,
+    tablets: report?.infrastructure.tablets,
+    projectors: report?.infrastructure.projectors,
+    printers: report?.infrastructure.printers
   }));
 
   // Prepare connectivity trends
   const connectivityTrendData = reports.map(report => ({
-    period: report.period,
-    hasInternet: report.infrastructure.internetConnection !== 'None' ? 1 : 0,
-    internetSpeed: report.infrastructure.internetSpeedMbps,
-    hasPowerBackup: report.infrastructure.powerBackup ? 1 : 0
+    period: report?.period,
+    hasInternet: report.infrastructure.internet_connection !== 'None' ? 1 : 0,
+    internetSpeed: report.infrastructure.internet_speed_mbps,
+    hasPowerBackup: report?.infrastructure.power_backup ? 1 : 0
   }));
 
   // Get observation summary
   const getObservationSummary = (report: ICTReport) => {
-    const teacherUsagePercent = Math.round((report.usage.teachersUsingICT / report.usage.totalTeachers) * 100);
-    const trainedTeachersPercent = Math.round((report.capacity.ictTrainedTeachers / report.usage.totalTeachers) * 100);
-    const deviceUtilization = Math.round((report.infrastructure.functionalDevices / (report.infrastructure.computers + report.infrastructure.tablets)) * 100) || 0;
+    const teacherUsagePercent = Math.round((report.usage.teachers_using_ict / report.usage.total_teachers) * 100);
+    const trainedTeachersPercent = Math.round((report.capacity.ict_trained_teachers / report.usage.total_teachers) * 100);
+    const deviceUtilization = Math.round((report.infrastructure.functional_devices / (report.infrastructure.computers + report.infrastructure.tablets)) * 100) || 0;
     
     return {
       teacherUsagePercent,
       trainedTeachersPercent,
       deviceUtilization,
-      hasInternet: report.infrastructure.internetConnection !== 'None',
-      hasPowerBackup: report.infrastructure.powerBackup,
-      functionalDevices: report.infrastructure.functionalDevices,
-      studentLiteracy: report.usage.studentDigitalLiteracyRate,
-      weeklyLabHours: report.usage.weeklyComputerLabHours,
+      hasInternet: report.infrastructure.internet_connection !== 'None',
+      hasPowerBackup: report.infrastructure.power_backup,
+      functionalDevices: report.infrastructure.functional_devices,
+      studentLiteracy: report.usage.student_digital_literacy_rate,
+      weeklyLabHours: report.usage.weekly_computer_lab_hours,
       readinessScore: calculateICTReadinessLevel([report]).score
     };
   };
@@ -213,7 +219,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
         title={school.name}
         description={
           <div className="space-y-2">
-            <p>{school.type} school in {school.district}, {school.subCounty}</p>
+            <p>{school.type} school in {school.district}, {school.sub_county}</p>
             <div className="flex items-center space-x-4">
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                 readinessLevel.level === 'High' ? 'bg-green-100 text-green-800' :
@@ -284,7 +290,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                 </div>
                 <div className="ml-4">
                   <p className="text-blue-100 text-sm font-medium">Total Students</p>
-                  <h3 className="text-2xl font-bold">{school.total_enrollment}</h3>
+                  <h3 className="text-2xl font-bold">{school.total_students}</h3>
                 </div>
               </div>
             </Card>
@@ -308,22 +314,22 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                 </div>
                 <div className="ml-4">
                   <p className="text-green-100 text-sm font-medium">Student Computers</p>
-                  <h3 className="text-2xl font-bold">{school.computers}</h3>
+                  <h3 className="text-2xl font-bold">{school.student_computers}</h3>
                 </div>
               </div>
             </Card>
 
-            {/* <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
               <div className="flex items-center">
                 <div className="p-3 rounded-full bg-purple-400 bg-opacity-30">
                   <Wifi className="h-6 w-6" />
                 </div>
                 <div className="ml-4">
                   <p className="text-purple-100 text-sm font-medium">Internet Speed</p>
-                  <h3 className="text-2xl font-bold">{school.internet.bandwidthMbps} Mbps</h3>
+                  <h3 className="text-2xl font-bold">{school.bandwidth_mbps} Mbps</h3>
                 </div>
               </div>
-            </Card> */}
+            </Card>
           </div>
 
           {/* Basic Information */}
@@ -335,9 +341,12 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">School Details</h3>
                     <p className="text-base font-medium text-gray-900">{school.name}</p>
-                    <p className="text-sm text-gray-600">{school.ownership_type} • {school.location_type}</p>
+                    <p className="text-sm text-gray-600">{school.ownership_type} • {school.environment}</p>
                     {school.emis_number && (
                       <p className="text-sm text-gray-500">EMIS: {school.emis_number}</p>
+                    )}
+                    {school.upi_code && (
+                      <p className="text-sm text-gray-500">UPI CODE: {school.upi_code}</p>
                     )}
                   </div>
                 </div>
@@ -358,9 +367,9 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Enrollment</h3>
                     <p className="text-base text-gray-900">{school.total_students} Students</p>
-                    {/* <p className="text-sm text-gray-600">
-                      {school.enrollmentData.maleStudents} Male • {school.femaleStudents} Female
-                    </p> */}
+                    <p className="text-sm text-gray-600">
+                      {school.male_students} Male • {school.female_students} Female
+                    </p>
                   </div>
                 </div>
               </div>
@@ -372,7 +381,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   <Users className="h-5 w-5 text-gray-400 mt-0.5 mr-3" />
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Head Teacher</h3>
-                    <p className="text-base text-gray-900">{school.head_teacher_name}</p>
+                    <p className="text-base text-gray-900">{school.head_teacher}</p>
                   </div>
                 </div>
                 
@@ -380,8 +389,8 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   <Mail className="h-4 w-4 text-gray-400 mt-1 mr-3" />
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Email</h3>
-                    <a href={`mailto:${school.head_teacher_contact}`} className="text-base text-blue-600 hover:text-blue-800">
-                      {school.head_teacher_contact}
+                    <a href={`mailto:${school.school_email}`} className="text-base text-blue-600 hover:text-blue-800">
+                      {school.school_email}
                     </a>
                   </div>
                 </div>
@@ -390,8 +399,8 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   <Phone className="h-4 w-4 text-gray-400 mt-1 mr-3" />
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Phone</h3>
-                    <a href={`tel:${school.head_teacher_contact}`} className="text-base text-blue-600 hover:text-blue-800">
-                      {school.head_teacher_contact}
+                    <a href={`tel:${school.school_phone}`} className="text-base text-blue-600 hover:text-blue-800">
+                      {school.school_phone}
                     </a>
                   </div>
                 </div>
@@ -418,7 +427,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                       <div className="text-center p-4 bg-green-50 rounded-lg">
                         <div className="text-2xl font-bold text-green-600">{summary.teacherUsagePercent}%</div>
                         <div className="text-sm text-gray-600">Teacher ICT Usage</div>
-                        <div className="text-xs text-gray-500">{latestReport.usage.teachersUsingICT} of {latestReport.usage.totalTeachers}</div>
+                        <div className="text-xs text-gray-500">{latestReport?.usage?.teachers_using_ict || 0} of {latestReport?.usage?.total_teachers || 0}</div>
                       </div>
                       
                       <div className="text-center p-4 bg-purple-50 rounded-lg">
@@ -450,21 +459,21 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-lg font-medium text-gray-900">Student Computers</h4>
-                    <p className="text-3xl font-bold text-blue-600">{school.computers}</p>
+                    <p className="text-3xl font-bold text-blue-600">{school.student_computers}</p>
                   </div>
                   <Laptop className="h-8 w-8 text-blue-500" />
                 </div>
               </div>
               
-              {/* <div className="bg-green-50 rounded-lg p-4">
+              <div className="bg-green-50 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-lg font-medium text-gray-900">Teacher Computers</h4>
-                    <p className="text-3xl font-bold text-green-600">{school.infrastructure.teacherComputers}</p>
+                    <p className="text-3xl font-bold text-green-600">{school.teacher_computers}</p>
                   </div>
                   <Laptop className="h-8 w-8 text-green-500" />
                 </div>
-              </div> */}
+              </div>
               
               <div className="bg-purple-50 rounded-lg p-4">
                 <div className="flex items-center justify-between">
@@ -480,7 +489,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-lg font-medium text-gray-900">Smart Boards</h4>
-                    <p className="text-3xl font-bold text-amber-600">{school.interactive_whiteboards || 0}</p>
+                    <p className="text-3xl font-bold text-amber-600">{school.smart_boards || 0}</p>
                   </div>
                   <Monitor className="h-8 w-8 text-amber-500" />
                 </div>
@@ -496,15 +505,15 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                 </div>
               </div>
               
-              {/* <div className="bg-indigo-50 rounded-lg p-4">
+              <div className="bg-indigo-50 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-lg font-medium text-gray-900">Laptops</h4>
-                    <p className="text-3xl font-bold text-indigo-600">{school.infrastructure.laptops}</p>
+                    <p className="text-3xl font-bold text-indigo-600">{school.laptops}</p>
                   </div>
                   <Laptop className="h-8 w-8 text-indigo-500" />
                 </div>
-              </div> */}
+              </div>
             </div>
           </Card>
 
@@ -516,19 +525,19 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   <StatusBadge condition={school.has_computer_lab} trueText="Available" falseText="Not Available" />
                 </div>
                 
-                {/* {school.has_computer_lab && school.infrastructure.labCondition && (
+                {school.has_computer_lab && school.lab_condition && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700">Lab Condition</span>
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      school.infrastructure.labCondition === 'Excellent' ? 'bg-green-100 text-green-800' :
-                      school.infrastructure.labCondition === 'Good' ? 'bg-blue-100 text-blue-800' :
-                      school.infrastructure.labCondition === 'Fair' ? 'bg-amber-100 text-amber-800' :
+                      school.lab_condition === 'Excellent' ? 'bg-green-100 text-green-800' :
+                      school.lab_condition === 'Good' ? 'bg-blue-100 text-blue-800' :
+                      school.lab_condition === 'Fair' ? 'bg-amber-100 text-amber-800' :
                       'bg-red-100 text-red-800'
                     }`}>
-                      {school.infrastructure.labCondition}
+                      {school.lab_condition}
                     </span>
                   </div>
-                )} */}
+                )}
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">ICT Room</span>
@@ -547,12 +556,12 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
               </div>
             </Card>
 
-            {/* <Card title="Power Infrastructure">
+            <Card title="Power Infrastructure">
               <div className="space-y-4">
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Power Backup Systems</h4>
                   <div className="flex flex-wrap gap-2">
-                    {school.infrastructure.powerBackup.map((backup) => (
+                    {school.power_backup?.split(',').map((backup) => (
                       <span key={backup} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         <Zap className="h-3 w-3 mr-1" />
                         {backup}
@@ -561,7 +570,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   </div>
                 </div>
               </div>
-            </Card> */}
+            </Card>
           </div>
         </div>
       )}
@@ -575,52 +584,52 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Connection Type</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    school.connection_types === 'Fiber' ? 'bg-green-100 text-green-800' :
-                    school.connection_types === 'Mobile Broadband' ? 'bg-blue-100 text-blue-800' :
-                    school.connection_types === 'Satellite' ? 'bg-purple-100 text-purple-800' :
+                    school.connection_type === 'Fiber' ? 'bg-green-100 text-green-800' :
+                    school.connection_type === 'Mobile Broadband' ? 'bg-blue-100 text-blue-800' :
+                    school.connection_type === 'Satellite' ? 'bg-purple-100 text-purple-800' :
                     'bg-red-100 text-red-800'
                   }`}>
-                    {school.connection_types}
+                    {school.connection_type}
                   </span>
                 </div>
                 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Bandwidth</span>
-                  <span className="text-sm font-semibold text-gray-900">{school.internet.bandwidthMbps} Mbps</span>
-                </div> */}
+                  <span className="text-sm font-semibold text-gray-900">{school.bandwidth_mbps} Mbps</span>
+                </div>
                 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Stability</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    school.internet.stability === 'High' ? 'bg-green-100 text-green-800' :
-                    school.internet.stability === 'Medium' ? 'bg-amber-100 text-amber-800' :
+                    school.stability === 'High' ? 'bg-green-100 text-green-800' :
+                    school.stability === 'Medium' ? 'bg-amber-100 text-amber-800' :
                     'bg-red-100 text-red-800'
                   }`}>
-                    {school.internet.stability}
+                    {school.stability}
                   </span>
-                </div> */}
+                </div>
                 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Usage Policy</span>
-                  <StatusBadge condition={school.internet.hasUsagePolicy} trueText="In Place" falseText="Not Available" />
-                </div> */}
+                  <StatusBadge condition={school.has_usage_policy} trueText="In Place" falseText="Not Available" />
+                </div>
                 
-                {school.internet_provider && (
+                {school.provider && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700">Provider</span>
-                    <span className="text-sm font-semibold text-gray-900">{school.internet_provider}</span>
+                    <span className="text-sm font-semibold text-gray-900">{school.provider}</span>
                   </div>
                 )}
               </div>
             </Card>
 
-            {/* <Card title="WiFi Coverage">
+            <Card title="WiFi Coverage">
               <div className="space-y-4">
                 <h4 className="text-sm font-medium text-gray-700">Coverage Areas</h4>
                 <div className="grid grid-cols-2 gap-2">
-                  {['Administration', 'Classrooms', 'Library', 'Dormitories'].map((area) => (
+                  {school.wifi_coverage.split(',').map((area) => (
                     <div key={area} className="flex items-center space-x-2">
-                      {school.internet.wifiCoverage.includes(area as any) ? (
+                      {school.wifi_coverage.includes(area as any) ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
                         <XCircle className="h-4 w-4 text-red-500" />
@@ -630,7 +639,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   ))}
                 </div>
               </div>
-            </Card> */}
+            </Card>
           </div>
 
           <Card title="Software & Digital Resources">
@@ -641,22 +650,22 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   <StatusBadge condition={school.has_digital_content} trueText="Available" falseText="Not Available" />
                 </div>
                 
-                {/* {school.has_digital_content && (
+                {school.has_digital_content && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700">LMS Platform</span>
-                    <span className="text-sm font-semibold text-gray-900">{school.software.lmsName}</span>
+                    <span className="text-sm font-semibold text-gray-900">{school.lms_name}</span>
                   </div>
-                )} */}
+                )}
                 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Licensed Software</span>
-                  <StatusBadge condition={school.software.hasLicensedSoftware} trueText="Available" falseText="Not Available" />
-                </div> */}
-{/*                 
+                  <StatusBadge condition={school.has_licensed_software} trueText="Available" falseText="Not Available" />
+                </div>
+                
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Digital Library</span>
-                  <StatusBadge condition={school.software.hasDigitalLibrary} trueText="Available" falseText="Not Available" />
-                </div> */}
+                  <StatusBadge condition={school.has_digital_library} trueText="Available" falseText="Not Available" />
+                </div>
                 
                 {school.content_source && (
                   <div className="flex items-center justify-between">
@@ -667,29 +676,29 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
               </div>
               
               <div className="space-y-4">
-                {/* {school.software.hasLicensedSoftware && (
+                {school.has_licensed_software && (
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Licensed Software</h4>
                     <div className="flex flex-wrap gap-2">
-                      {school.software.licensedSoftware.map((software) => (
+                      {school.licensed_software.split(',').map((software) => (
                         <span key={software} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                           {software}
                         </span>
                       ))}
                     </div>
                   </div>
-                )} */}
+                )}
                 
-                {/* <div>
+                <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Productivity Suites</h4>
                   <div className="flex flex-wrap gap-2">
-                    {school.software.productivitySuite.map((suite) => (
+                    {school.productivity_suite.split(',').map((suite) => (
                       <span key={suite} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         {suite}
                       </span>
                     ))}
                   </div>
-                </div> */}
+                </div>
               </div>
             </div>
           </Card>
@@ -700,34 +709,34 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
       {currentTab === 'governance' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* <Card title="ICT Governance">
+            <Card title="ICT Governance">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">ICT Policy</span>
-                  <StatusBadge condition={school.governance.hasICTPolicy} trueText="In Place" falseText="Not Available" />
+                  <StatusBadge condition={school.has_ict_policy} trueText="In Place" falseText="Not Available" />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">National Strategy Alignment</span>
-                  <StatusBadge condition={school.governance.alignedWithNationalStrategy} trueText="Aligned" falseText="Not Aligned" />
+                  <StatusBadge condition={school.aligned_with_national_strategy} trueText="Aligned" falseText="Not Aligned" />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">ICT Committee</span>
-                  <StatusBadge condition={school.governance.hasICTCommittee} trueText="Active" falseText="Not Active" />
+                  <StatusBadge condition={school.has_ict_committee} trueText="Active" falseText="Not Active" />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">ICT Budget</span>
-                  <StatusBadge condition={school.governance.hasICTBudget} trueText="Allocated" falseText="Not Allocated" />
+                  <StatusBadge condition={school.has_ict_budget} trueText="Allocated" falseText="Not Allocated" />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Monitoring System</span>
-                  <StatusBadge condition={school.governance.hasMonitoringSystem} trueText="In Place" falseText="Not Available" />
+                  <StatusBadge condition={school.has_ict_budget} trueText="In Place" falseText="Not Available" />
                 </div>
               </div>
-            </Card> */}
+            </Card>
 
             <Card title="Human Capacity">
               <div className="space-y-4">
@@ -740,59 +749,59 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Support Staff</span>
-                  <span className="text-sm font-semibold text-gray-900">{school.num_of_staff}</span>
+                  <span className="text-sm font-semibold text-gray-900">{school.support_staff}</span>
                 </div>
                 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Monthly Trainings</span>
-                  <span className="text-sm font-semibold text-gray-900">{school.humanCapacity.monthlyTrainings}</span>
-                </div> */}
+                  <span className="text-sm font-semibold text-gray-900">{school.monthly_trainings}</span>
+                </div>
                 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Teacher Competency Level</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    school.humanCapacity.teacherCompetencyLevel === 'Advanced' ? 'bg-green-100 text-green-800' :
-                    school.humanCapacity.teacherCompetencyLevel === 'Intermediate' ? 'bg-blue-100 text-blue-800' :
+                    school.teacher_competency_level === 'Advanced' ? 'bg-green-100 text-green-800' :
+                    school.teacher_competency_level === 'Intermediate' ? 'bg-blue-100 text-blue-800' :
                     'bg-amber-100 text-amber-800'
                   }`}>
-                    {school.humanCapacity.teacherCompetencyLevel}
+                    {school.teacher_competency_level}
                   </span>
-                </div> */}
+                </div>
               </div>
             </Card>
           </div>
 
           <Card title="Community Engagement">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* <div className="space-y-4">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Parent Portal</span>
-                  <StatusBadge condition={school.communityEngagement.hasParentPortal} trueText="Active" falseText="Not Available" />
+                  <StatusBadge condition={school.has_parent_portal} trueText="Active" falseText="Not Available" />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Community Outreach</span>
-                  <StatusBadge condition={school.communityEngagement.hasCommunityOutreach} trueText="Active" falseText="Not Active" />
+                  <StatusBadge condition={school.has_community_outreach} trueText="Active" falseText="Not Active" />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Industry Partners</span>
-                  <StatusBadge condition={school.communityEngagement.hasIndustryPartners} trueText="Available" falseText="None" />
+                  <StatusBadge condition={school.has_industry_partners} trueText="Available" falseText="None" />
                 </div>
-              </div> */}
+              </div>
               
-              {/* {school.communityEngagement.partnerOrganizations.length > 0 && (
+              {school.partner_organizations.length > 0 && (
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Partner Organizations</h4>
                   <div className="flex flex-wrap gap-2">
-                    {school.communityEngagement.partnerOrganizations.map((partner) => (
+                    {school.partner_organizations.split(',').map((partner) => (
                       <span key={partner} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                         {partner}
                       </span>
                     ))}
                   </div>
                 </div>
-              )} */}
+              )}
             </div>
           </Card>
 
@@ -804,58 +813,58 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                   <StatusBadge condition={school.has_computer_lab} trueText="Active" falseText="Not Active" />
                 </div>
                 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Online Platforms Usage</span>
-                  <StatusBadge condition={school.studentEngagement.usesOnlinePlatforms} trueText="Active" falseText="Not Used" />
-                </div> */}
+                  <StatusBadge condition={school.uses_online_platforms} trueText="Active" falseText="Not Used" />
+                </div>
                 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Digital Literacy Level</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    school.studentEngagement.digitalLiteracyLevel === 'Advanced' ? 'bg-green-100 text-green-800' :
-                    school.studentEngagement.digitalLiteracyLevel === 'Intermediate' ? 'bg-blue-100 text-blue-800' :
+                    school.digital_literacy_level === 'Advanced' ? 'bg-green-100 text-green-800' :
+                    school.digital_literacy_level === 'Intermediate' ? 'bg-blue-100 text-blue-800' :
                     'bg-amber-100 text-amber-800'
                   }`}>
-                    {school.studentEngagement.digitalLiteracyLevel}
+                    {school.digital_literacy_level}
                   </span>
-                </div> */}
+                </div>
                 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Student Feedback Rating</span>
                   <div className="flex items-center">
-                    <span className="text-sm font-semibold text-gray-900 mr-2">{school.studentEngagement.studentFeedbackRating}/5</span>
+                    <span className="text-sm font-semibold text-gray-900 mr-2">{school.student_feedback_rating}/5</span>
                     <div className="flex">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Award key={star} className={`h-4 w-4 ${
-                          star <= school.studentEngagement.studentFeedbackRating ? 'text-yellow-400' : 'text-gray-300'
+                          star <= school.student_feedback_rating ? 'text-yellow-400' : 'text-gray-300'
                         }`} />
                       ))}
                     </div>
                   </div>
-                </div> */}
+                </div>
               </div>
               
-              {/* <div className="space-y-4">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">ICT Integrated Lessons</span>
-                  <span className="text-sm font-semibold text-gray-900">{school.pedagogicalUsage.ictIntegratedLessons}/month</span>
+                  <span className="text-sm font-semibold text-gray-900">{school.ict_integrated_lessons}/month</span>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">ICT Assessments</span>
-                  <StatusBadge condition={school.pedagogicalUsage.usesICTAssessments} trueText="Used" falseText="Not Used" />
+                  <StatusBadge condition={school.uses_ict_assessments} trueText="Used" falseText="Not Used" />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Student Projects</span>
-                  <StatusBadge condition={school.pedagogicalUsage.hasStudentProjects} trueText="Active" falseText="None" />
+                  <StatusBadge condition={school.has_student_projects} trueText="Active" falseText="None" />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Blended Learning</span>
-                  <StatusBadge condition={school.pedagogicalUsage.usesBlendedLearning} trueText="Implemented" falseText="Not Used" />
+                  <StatusBadge condition={school.uses_blended_learning} trueText="Implemented" falseText="Not Used" />
                 </div>
-              </div> */}
+              </div>
             </div>
           </Card>
         </div>
@@ -897,7 +906,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                       <div className="flex-1">
                         <div className="flex items-center space-x-3">
                           <h4 className="text-lg font-medium text-gray-900">
-                            Periodic Observation - {report.period}
+                            Periodic Observation - {report?.period}
                           </h4>
                           <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             summary.readinessScore >= 70 ? 'bg-green-100 text-green-800' :
@@ -908,7 +917,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
-                          Observed on {new Date(report.date).toLocaleDateString()}
+                          Observed on {new Date(report?.date).toLocaleDateString('en-GB')}
                         </p>
                       </div>
                       <div className="flex space-x-2">
@@ -994,35 +1003,35 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                             <div className="space-y-2">
                               <div className="flex justify-between text-sm">
                                 <span>Computers:</span>
-                                <span className="font-medium">{report.infrastructure.computers}</span>
+                                <span className="font-medium">{report?.infrastructure.computers}</span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>Tablets:</span>
-                                <span className="font-medium">{report.infrastructure.tablets}</span>
+                                <span className="font-medium">{report?.infrastructure.tablets || 0}</span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>Projectors:</span>
-                                <span className="font-medium">{report.infrastructure.projectors}</span>
+                                <span className="font-medium">{report?.infrastructure.projectors}</span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>Printers:</span>
-                                <span className="font-medium">{report.infrastructure.printers}</span>
+                                <span className="font-medium">{report?.infrastructure.printers || 0}</span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>Functional Devices:</span>
-                                <span className="font-medium">{report.infrastructure.functionalDevices}</span>
+                                <span className="font-medium">{report?.infrastructure.functional_devices}</span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>Internet Speed:</span>
                                 <span className="font-medium">
-                                  {report.infrastructure.internetConnection === 'None' 
+                                  {report.infrastructure.internet_connection === 'None' 
                                     ? 'No Internet' 
-                                    : `${report.infrastructure.internetSpeedMbps} Mbps`}
+                                    : `${report?.infrastructure.internet_speed_mbps} Mbps`}
                                 </span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>Power Sources:</span>
-                                <span className="font-medium">{report.infrastructure.powerSource.join(', ')}</span>
+                                <span className="font-medium">{report?.infrastructure.power_source?.join(', ')}</span>
                               </div>
                             </div>
                           </div>
@@ -1037,7 +1046,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                               <div className="flex justify-between text-sm">
                                 <span>Teachers Using ICT:</span>
                                 <span className="font-medium">
-                                  {report.usage.teachersUsingICT} of {report.usage.totalTeachers}
+                                  {report.usage.teachers_using_ict} of {report.usage.total_teachers}
                                   <span className="text-xs text-gray-500 ml-1">
                                     ({summary.teacherUsagePercent}%)
                                   </span>
@@ -1045,16 +1054,16 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>Weekly Lab Hours:</span>
-                                <span className="font-medium">{report.usage.weeklyComputerLabHours}h</span>
+                                <span className="font-medium">{report.usage.weekly_computer_lab_hours}h</span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>Student Digital Literacy:</span>
-                                <span className="font-medium">{report.usage.studentDigitalLiteracyRate}%</span>
+                                <span className="font-medium">{report.usage.student_digital_literacy_rate}%</span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>ICT-Trained Teachers:</span>
                                 <span className="font-medium">
-                                  {report.capacity.ictTrainedTeachers} of {report.usage.totalTeachers}
+                                  {report.capacity.ictTrainedTeachers} of {report.usage.total_teachers}
                                   <span className="text-xs text-gray-500 ml-1">
                                     ({summary.trainedTeachersPercent}%)
                                   </span>
@@ -1062,7 +1071,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span>Support Staff:</span>
-                                <span className="font-medium">{report.capacity.supportStaff}</span>
+                                <span className="font-medium">{report.capacity.support_staff}</span>
                               </div>
                             </div>
                           </div>
@@ -1077,7 +1086,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                               <div>
                                 <span className="text-sm text-gray-600">Operating Systems:</span>
                                 <div className="flex flex-wrap gap-1 mt-1">
-                                  {report.software.operatingSystems.map((os) => (
+                                  {report.software.operating_systems.map((os) => (
                                     <span key={os} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                                       {os}
                                     </span>
@@ -1087,8 +1096,8 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                               <div>
                                 <span className="text-sm text-gray-600">Educational Software:</span>
                                 <div className="flex flex-wrap gap-1 mt-1">
-                                  {report.software.educationalSoftware.length > 0 ? (
-                                    report.software.educationalSoftware.map((software) => (
+                                  {report.software.educational_software.length > 0 ? (
+                                    report.software.educational_software.map((software) => (
                                       <span key={software} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                         {software}
                                       </span>
@@ -1101,7 +1110,7 @@ const SchoolDetail: React.FC<SchoolDetailProps> = ({
                               <div className="flex justify-between text-sm">
                                 <span>Office Applications:</span>
                                 <span className="font-medium">
-                                  {report.software.officeApplications ? 'Available' : 'Not Available'}
+                                  {report.software.office_applications ? 'Available' : 'Not Available'}
                                 </span>
                               </div>
                             </div>

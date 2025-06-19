@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { School, ICTReport } from '../types';
-import mockSchoolsData from '../data/mockSchools.json';
-import mockReportsData from '../data/mockReports.json';
+import { useQuery } from '@apollo/client';
+import { 
+  LOAD_SCHOOLS, 
+  LOAD_SCHOOL_PERIODIC_OBSERVATIONS 
+} from '../gql/queries';
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -24,6 +27,7 @@ interface DataContextType {
   error: string | null;
   fetchSchools: (page: number, pageSize: number, search?: string, district?: string) => Promise<PaginatedResponse<School>>;
   totalSchools: number;
+  refetchReports: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -39,13 +43,60 @@ export const useData = (): DataContextType => {
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [schools, setSchools] = useState<School[]>([]);
   const [reports, setReports] = useState<ICTReport[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [totalSchools, setTotalSchools] = useState<number>(0);
   const [allSchools, setAllSchools] = useState<School[]>([]);
 
-  // Simulate API delay
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  // Load schools query
+  const { 
+    data: schoolsData, 
+    loading: loadingSchools, 
+    error: schoolsError,
+    refetch: refetchSchools 
+  } = useQuery(LOAD_SCHOOLS);
+
+  // Load reports query
+  const { 
+    data: reportsData, 
+    loading: loadingReports, 
+    error: reportsError,
+    refetch: refetchReports 
+  } = useQuery(LOAD_SCHOOL_PERIODIC_OBSERVATIONS);
+
+  // Handle schools data loading
+  useEffect(() => {
+    if (schoolsData) {
+      const loadedSchools = schoolsData.schools || [];
+      setAllSchools(loadedSchools);
+      setTotalSchools(loadedSchools.length);
+      setSchools(loadedSchools.slice(0, 25)); // Default first page
+    }
+  }, [schoolsData]);
+
+  // Handle reports data loading
+  useEffect(() => {
+    if (reportsData) {
+      const loadedReports = reportsData.school_periodic_observations || [];
+      setReports(loadedReports);
+    }
+  }, [reportsData]);
+
+  // Combine loading states
+  useEffect(() => {
+    setLoading(loadingSchools || loadingReports);
+  }, [loadingSchools, loadingReports]);
+
+  // Combine error states
+  useEffect(() => {
+    if (schoolsError) {
+      setError(schoolsError.message);
+    } else if (reportsError) {
+      setError(reportsError.message);
+    } else {
+      setError(null);
+    }
+  }, [schoolsError, reportsError]);
 
   // Fetch schools with pagination and filtering
   const fetchSchools = async (
@@ -55,12 +106,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     district?: string
   ): Promise<PaginatedResponse<School>> => {
     try {
-      setLoading(false);
+      setLoading(true);
       setError(null);
       
-      // Simulate network delay for realistic loading experience
-      await delay(300);
-
       let filteredSchools = [...allSchools];
 
       // Apply search filter
@@ -69,8 +117,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         filteredSchools = filteredSchools.filter(school => 
           school.name.toLowerCase().includes(searchLower) ||
           school.district.toLowerCase().includes(searchLower) ||
-          school.subCounty.toLowerCase().includes(searchLower) ||
-          school.contactInfo.principalName.toLowerCase().includes(searchLower)
+          school.sub_county.toLowerCase().includes(searchLower) ||
+          school.head_teacher.toLowerCase().includes(searchLower)
         );
       }
 
@@ -106,53 +154,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Initial data load
-  useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Load all schools data
-        const schoolsData = mockSchoolsData.schools as School[];
-        setAllSchools(schoolsData);
-        setTotalSchools(schoolsData.length);
-        
-        // Load reports data
-        setReports(mockReportsData.reports as ICTReport[]);
-        
-        // Load first page of schools
-        await fetchSchools(1, 25);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load initial data';
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadInitialData();
-  }, []); // Empty dependency array to run only once
-
-  // Generate a unique ID
-  const generateId = (prefix: string): string => {
-    return `${prefix}${Date.now().toString(36)}${Math.random().toString(36).substr(2, 5)}`;
-  };
-
   const addSchool = async (schoolData: Omit<School, 'id'>): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
-      await delay(500);
-
-      const newSchool: School = {
-        ...schoolData,
-        id: generateId('SCH')
-      };
-      
-      setAllSchools(prev => [...prev, newSchool]);
-      setSchools(prevSchools => [...prevSchools, newSchool]);
-      setTotalSchools(prev => prev + 1);
+      await refetchSchools(); // Refresh schools data after addition
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to add school';
       setError(errorMessage);
@@ -166,14 +172,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       setError(null);
-      await delay(500);
-
-      setAllSchools(prevSchools => 
-        prevSchools.map(s => s.id === school.id ? school : s)
-      );
-      setSchools(prevSchools => 
-        prevSchools.map(s => s.id === school.id ? school : s)
-      );
+      await refetchSchools(); // Refresh schools data after update
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update school';
       setError(errorMessage);
@@ -187,12 +186,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       setError(null);
-      await delay(500);
-
-      setAllSchools(prevSchools => prevSchools.filter(s => s.id !== id));
-      setSchools(prevSchools => prevSchools.filter(s => s.id !== id));
-      setReports(prevReports => prevReports.filter(r => r.schoolId !== id));
-      setTotalSchools(prev => prev - 1);
+      await refetchSchools(); // Refresh schools data after deletion
+      await refetchReports(); // Also refresh reports since they reference schools
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete school';
       setError(errorMessage);
@@ -206,14 +201,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       setError(null);
-      await delay(500);
-
-      const newReport: ICTReport = {
-        ...reportData,
-        id: generateId('RPT')
-      };
-      
-      setReports(prevReports => [...prevReports, newReport]);
+      await refetchReports(); // Refresh reports data after addition
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to add report';
       setError(errorMessage);
@@ -227,11 +215,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       setError(null);
-      await delay(500);
-
-      setReports(prevReports => 
-        prevReports.map(r => r.id === report.id ? report : r)
-      );
+      await refetchReports(); // Refresh reports data after update
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update report';
       setError(errorMessage);
@@ -245,9 +229,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       setError(null);
-      await delay(500);
-
-      setReports(prevReports => prevReports.filter(r => r.id !== id));
+      await refetchReports(); // Refresh reports data after deletion
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete report';
       setError(errorMessage);
@@ -271,7 +253,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         error,
         fetchSchools,
-        totalSchools
+        totalSchools,
+        refetchReports
       }}
     >
       {children}

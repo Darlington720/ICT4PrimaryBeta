@@ -34,7 +34,7 @@ const MapView: React.FC<MapViewProps> = ({ schools, reports }) => {
     const levels: Record<string, { level: 'Low' | 'Medium' | 'High', score: number }> = {};
     
     schools.forEach(school => {
-      const schoolReports = reports.filter(report => report.schoolId === school.id);
+      const schoolReports = reports.filter(report => report.school_id === school.id);
       levels[school.id] = calculateICTReadinessLevel(schoolReports);
     });
     
@@ -198,29 +198,29 @@ const MapView: React.FC<MapViewProps> = ({ schools, reports }) => {
                 
                 {schools.map(school => {
                   const latestReport = reports
-                    .filter(report => report.schoolId === school.id)
+                    .filter(report => report.school_id === school.id)
                     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
                   
                   return (
                     <Marker 
                       key={school.id}
-                      position={[school.location.latitude, school.location.longitude]}
+                      position={[school.latitude, school.longitude]}
                       icon={createCustomIcon(school.id)}
                     >
                       <Popup>
                         <div className="p-1">
                           <h3 className="font-bold text-lg">{school.name}</h3>
-                          <p className="text-sm">{school.district}, {school.subCounty}</p>
+                          <p className="text-sm">{school.district}, {school.sub_county}</p>
                           <p className="text-sm">Type: {school.type}, {school.environment}</p>
-                          <p className="text-sm">Students: {school.enrollmentData.totalStudents}</p>
+                          <p className="text-sm">Students: {school.total_students}</p>
                           
                           {latestReport && (
                             <div className="mt-2 pt-2 border-t">
                               <h4 className="font-medium">Latest ICT Status ({latestReport.period}):</h4>
                               <p className="text-sm">Computers: {latestReport.infrastructure.computers}</p>
-                              <p className="text-sm">Internet: {latestReport.infrastructure.internetConnection}</p>
-                              <p className="text-sm">Teachers using ICT: {latestReport.usage.teachersUsingICT} of {latestReport.usage.totalTeachers}</p>
-                              <p className="text-sm">Student digital literacy: {latestReport.usage.studentDigitalLiteracyRate}%</p>
+                              <p className="text-sm">Internet: {latestReport.infrastructure.internet_connection}</p>
+                              <p className="text-sm">Teachers using ICT: {latestReport.usage.teachers_using_ict} of {latestReport.usage.total_teachers}</p>
+                              <p className="text-sm">Student digital literacy: {latestReport.usage.student_digital_literacy_rate}%</p>
                               <div className="mt-1">
                                 <span className={`text-xs px-2 py-1 rounded-full ${
                                   readinessLevels[school.id]?.level === 'High' ? 'bg-green-100 text-green-800' :

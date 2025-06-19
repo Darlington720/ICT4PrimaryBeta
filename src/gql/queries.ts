@@ -7,56 +7,101 @@ const LOAD_SCHOOLS = gql`
       name
       emis_number
       upi_code
-      ownership_type
-      school_category
-      year_established
-      head_teacher_name
-      head_teacher_contact
-      location_type
       region
       district
       sub_county
-      parish
-      distance_from_achor_hq
       latitude
       longitude
-      total_enrollment
+      type
+      environment
+      ownership_type
+      school_category
+      signature_program
+      year_established
+      head_teacher
+      school_email
+      school_phone
+      total_students
+      male_students
+      female_students
+      student_computers
+      teacher_computers
+      projectors
+      smart_boards
+      tablets
+      laptops
+      has_computer_lab
+      lab_condition
+      has_ict_room
+      has_electricity
+      has_secure_room
+      has_furniture
+      power_backup
+      connection_type
+      bandwidth_mbps
+      wifi_coverage
+      stability
+      has_usage_policy
+      provider
+      is_stable
+      has_lms
+      lms_name
+      has_licensed_software
+      licensed_software
+      has_productivity_suite
+      productivity_suite
+      has_digital_library
+      has_local_content
+      content_source
+      ict_trained_teachers
       total_teachers
       male_teachers
       female_teachers
-      num_of_staff
-      signature_program
-      has_electricity
-      electricity_planned
-      has_secure_room_for_ict
-      has_computer_lab
-      has_furniture
-      computers
-      tablets
-      smartphones
-      projectors
-      interactive_whiteboards
-      other_devices
-      has_internet
-      connection_types
-      is_connection_stable
-      internet_provider
+      p5_to_p7_teachers
+      support_staff
+      monthly_trainings
+      teacher_competency_level
+      has_capacity_building
+      ict_integrated_lessons
+      uses_ict_assessments
+      has_student_projects
+      uses_blended_learning
+      has_assistive_tech
+      digital_tool_usage_frequency
+      has_digital_content
+      has_peer_support
+      has_ict_policy
+      aligned_with_national_strategy
+      has_ict_committee
+      has_ict_budget
+      has_monitoring_system
+      has_active_smc
+      has_active_pta
+      has_local_leader_engagement
+      digital_literacy_level
+      has_ict_club
+      uses_online_platforms
+      student_feedback_rating
+      students_using_digital_content
+      has_parent_portal
+      has_community_outreach
+      has_industry_partners
+      partner_organizations
+      ngo_support
+      community_contributions
       is_fenced
       has_security_guard
-      has_theft_incidents
-      theft_details
+      has_recent_incidents
+      incident_details
       has_toilets
       has_water_source
-      within_30km_from_archor_school
-      accessible_all_year
+      distance_from_hq
+      is_accessible_all_year
       is_inclusive
-      serves_special_needs
-      ict_trained_teachers
-      digital_tool_usage
-      has_digital_content
-      content_source
-      has_peer_support
-      ongoing_capacity_building
+      serves_girls
+      serves_pwds
+      serves_refugees
+      is_only_school_in_area
       permanent_classrooms
       semi_permanent_classrooms
       temporary_classrooms
@@ -68,183 +113,241 @@ const LOAD_SCHOOLS = gql`
       security_infrastructure
       school_accessibility
       nearby_health_facility
-      has_active_smc
-      has_active_pta
-      engagement_with_deo
-      ngo_support
-      community_contributions
-      ple_pass_rate
+      health_facility_distance
+      ple_pass_rate_year1
+      ple_pass_rate_year2
+      ple_pass_rate_year3
       literacy_trends
-      digital_content_users
+      numeracy_trends
       innovations
-      assessor_notes
-      assessed_by
+      unique_achievements
+      periodic_observations {
+        id
+        school_id
+        date
+        period
+        infrastructure {
+          computers
+          tablets
+          projectors
+          printers
+          internet_connection
+          internet_speed_mbps
+          power_source
+          power_backup
+          functional_devices
+        }
+        usage {
+          teachers_using_ict
+          total_teachers
+          weekly_computer_lab_hours
+          student_digital_literacy_rate
+        }
+        software {
+          operating_systems
+          educational_software
+          office_applications
+        }
+        capacity {
+          ict_trained_teachers
+          support_staff
+        }
+      }
     }
   }
 `;
 
 const LOAD_SCHOOL_DETAILS = gql`
-query school($schoolId: ID!) {
-  school(id: $schoolId) {
-    id
-    name
-    emis_number
-    upi_code
-    ownership_type
-    school_category
-    year_established
-    head_teacher_name
-    head_teacher_contact
-    district
-    region
-    sub_county
-    parish
-    distance_from_achor_hq
-    latitude
-    longitude
-    total_enrollment
-    total_teachers
-    male_teachers
-    female_teachers
-    num_of_staff
-    signature_program
-    has_electricity
-    electricity_planned
-    has_secure_room_for_ict
-    has_computer_lab
-    has_furniture
-    computers
-    tablets
-    smartphones
-    projectors
-    interactive_whiteboards
-    other_devices
-    has_internet
-    connection_types
-    is_connection_stable
-    internet_provider
-    is_fenced
-    has_security_guard
-    has_theft_incidents
-    theft_details
-    has_toilets
-    has_water_source
-    within_30km_from_archor_school
-    accessible_all_year
-    is_inclusive
-    serves_special_needs
-    ict_trained_teachers
-    digital_tool_usage
-    has_digital_content
-    content_source
-    has_peer_support
-    ongoing_capacity_building
-    location_type
-    permanent_classrooms
-    semi_permanent_classrooms
-    temporary_classrooms
-    pupil_classroom_ratio
-    boys_toilets
-    girls_toilets
-    staff_toilets
-    water_access
-    security_infrastructure
-    school_accessibility
-    nearby_health_facility
-    has_active_smc
-    has_active_pta
-    engagement_with_deo
-    ngo_support
-    community_contributions
-    ple_pass_rate
-    literacy_trends
-    digital_content_users
-    innovations
-    assessor_notes
-    assessed_by
+  query School($schoolId: ID!) {
+    school(id: $schoolId) {
+      id
+      name
+      emis_number
+      upi_code
+      region
+      district
+      sub_county
+      latitude
+      longitude
+      type
+      environment
+      ownership_type
+      school_category
+      signature_program
+      year_established
+      head_teacher
+      school_email
+      school_phone
+      total_students
+      male_students
+      female_students
+      student_computers
+      teacher_computers
+      projectors
+      smart_boards
+      tablets
+      laptops
+      has_computer_lab
+      lab_condition
+      has_ict_room
+      has_electricity
+      has_secure_room
+      has_furniture
+      power_backup
+      connection_type
+      bandwidth_mbps
+      wifi_coverage
+      stability
+      has_usage_policy
+      provider
+      is_stable
+      has_lms
+      lms_name
+      has_licensed_software
+      licensed_software
+      has_productivity_suite
+      productivity_suite
+      has_digital_library
+      has_local_content
+      content_source
+      ict_trained_teachers
+      total_teachers
+      male_teachers
+      female_teachers
+      p5_to_p7_teachers
+      support_staff
+      monthly_trainings
+      teacher_competency_level
+      has_capacity_building
+      ict_integrated_lessons
+      uses_ict_assessments
+      has_student_projects
+      uses_blended_learning
+      has_assistive_tech
+      digital_tool_usage_frequency
+      has_digital_content
+      has_peer_support
+      has_ict_policy
+      aligned_with_national_strategy
+      has_ict_committee
+      has_ict_budget
+      has_monitoring_system
+      has_active_smc
+      has_active_pta
+      has_local_leader_engagement
+      digital_literacy_level
+      has_ict_club
+      uses_online_platforms
+      student_feedback_rating
+      students_using_digital_content
+      has_parent_portal
+      has_community_outreach
+      has_industry_partners
+      partner_organizations
+      ngo_support
+      community_contributions
+      is_fenced
+      has_security_guard
+      has_recent_incidents
+      incident_details
+      has_toilets
+      has_water_source
+      distance_from_hq
+      is_accessible_all_year
+      is_inclusive
+      serves_girls
+      serves_pwds
+      serves_refugees
+      is_only_school_in_area
+      permanent_classrooms
+      semi_permanent_classrooms
+      temporary_classrooms
+      pupil_classroom_ratio
+      boys_toilets
+      girls_toilets
+      staff_toilets
+      water_access
+      security_infrastructure
+      school_accessibility
+      nearby_health_facility
+      health_facility_distance
+      ple_pass_rate_year1
+      ple_pass_rate_year2
+      ple_pass_rate_year3
+      literacy_trends
+      numeracy_trends
+      innovations
+      unique_achievements
+      periodic_observations {
+        id
+        school_id
+        date
+        period
+        infrastructure {
+          computers
+          tablets
+          projectors
+          printers
+          internet_connection
+          internet_speed_mbps
+          power_source
+          power_backup
+          functional_devices
+        }
+        usage {
+          teachers_using_ict
+          total_teachers
+          weekly_computer_lab_hours
+          student_digital_literacy_rate
+        }
+        software {
+          operating_systems
+          educational_software
+          office_applications
+        }
+        capacity {
+          ict_trained_teachers
+          support_staff
+        }
+      }
+    }
   }
-}
-`
+`;
 const LOAD_SCHOOL_PERIODIC_OBSERVATIONS = gql`
-query School_periodic_observations {
+ query School_periodic_observations {
   school_periodic_observations {
     id
     school_id
-    observation_date
-    term_quarter
-    p6_registered
-    p6_present
-    p6_notes
-    p7_registered
-    p7_present
-    p7_notes
-    teacher_attendance_total
-    teacher_attendance_present
-    teacher_attendance_absent
-    dropouts_total
-    dropouts_male
-    dropouts_female
-    dropouts_reasons
-    digital_subjects
-    lesson_frequency
-    teachers_using_digital
-    good_lesson_observed
-    peer_support
-    learners_engaged
-    learners_using_devices
-    engagement_level
-    # challenges
-    laptops_total
-    laptops_working
-    laptops_not_working
-    laptops_notes
-    projectors_total
-    projectors_working
-    projectors_not_working
-    projectors_notes
-    routers_total
-    routers_working
-    routers_not_working
-    routers_notes
-    solar_total
-    solar_working
-    solar_not_working
-    solar_notes
-    device_storage
-    sign_in_register
-    # power_available
-    internet_status
-    content_sources
-    new_content_introduced
-    learner_access_levels
-    head_teacher_involved
-    ict_coordinator
-    ict_schedule
-    smc_meeting
-    ict_discussions
-    # community_engagement
-    achievements
-    infrastructure_challenges
-    training_challenges
-    connectivity_challenges
-    content_challenges
-    other_challenges
-    immediate_actions
-    capacity_building_needs
-    support_requests
-    learner_attendance
-    teacher_attendance
-    digital_tools_use
-    infrastructure_condition
-    internet_availability
-    management_support
-    next_visit
-    assessor_notes
-    assessed_by
-    created_at
-    updated_at
+    date
+    period
+    infrastructure {
+      computers
+      tablets
+      projectors
+      printers
+      internet_connection
+      internet_speed_mbps
+      power_source
+      power_backup
+      functional_devices
+    }
+    usage {
+      teachers_using_ict
+      total_teachers
+      weekly_computer_lab_hours
+      student_digital_literacy_rate
+    }
+    software {
+      operating_systems
+      educational_software
+      office_applications
+    }
+    capacity {
+      ict_trained_teachers
+      support_staff
+    }
   }
 }
-`
+`;
 
 export { LOAD_SCHOOLS, LOAD_SCHOOL_DETAILS, LOAD_SCHOOL_PERIODIC_OBSERVATIONS };

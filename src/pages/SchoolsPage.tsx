@@ -14,19 +14,19 @@ const SchoolsPage: React.FC = () => {
   const [isAddingSchool, setIsAddingSchool] = useState(false);
   const [editingSchool, setEditingSchool] = useState<School | null>(null);
   const navigate = useNavigate();
-  const [_addSchool, {error: addSchoolErr, loading: addingSchool}] = useMutation(ADD_SCHOOL, {
-    refetchQueries: [
-      LOAD_SCHOOLS, 
-    ],
-  })
+  const [_addSchool, { error: addSchoolErr, loading: addingSchool }] = useMutation(ADD_SCHOOL, {
+    refetchQueries: [{ query: LOAD_SCHOOLS }],
+    awaitRefetchQueries: true,
+  });
 
   const handleAddSchool = () => {
     setIsAddingSchool(true);
     setEditingSchool(null);
   };
 
-  const handleEditSchool = (schoolId: string) => {
-    const school = schools.find(s => s.id === schoolId);
+  const handleEditSchool = (school: any) => {
+    console.log("editing....", school)
+    // const school = schools.find(s => s.id === schoolId);
     if (school) {
       setEditingSchool(school);
       setIsAddingSchool(false);
@@ -51,13 +51,11 @@ const SchoolsPage: React.FC = () => {
     if (res.data) {
       setIsAddingSchool(false);
     }
-    // if (schoolData.id) {
-    //   updateSchool(schoolData as School);
-    //   setEditingSchool(null);
-    // } else {
-    //   addSchool(schoolData);
-    //   setIsAddingSchool(false);
-    // }
+    if (schoolData.id) {
+      setEditingSchool(null);
+    } else {
+      setIsAddingSchool(false);
+    }
   };
 
   const handleCancel = () => {

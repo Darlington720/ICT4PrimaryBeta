@@ -85,23 +85,23 @@ const Dashboard: React.FC<DashboardProps> = ({ schools, reports }) => {
       if (periodReports.length === 0) return null;
 
       const avgTeacherUsage = periodReports.reduce((sum, report) => 
-        sum + (report.usage.teachersUsingICT / report.usage.totalTeachers) * 100, 0
+        sum + (report.usage.teachers_using_ict / report.usage.total_teachers) * 100, 0
       ) / periodReports.length;
 
       const avgStudentLiteracy = periodReports.reduce((sum, report) => 
-        sum + report.usage.studentDigitalLiteracyRate, 0
+        sum + report.usage.student_digital_literacy_rate, 0
       ) / periodReports.length;
 
       const avgFunctionalDevices = periodReports.reduce((sum, report) => 
-        sum + report.infrastructure.functionalDevices, 0
+        sum + report.infrastructure.functional_devices, 0
       ) / periodReports.length;
 
       const internetAccessPercent = (periodReports.filter(report => 
-        report.infrastructure.internetConnection !== 'None'
+        report.infrastructure.internet_connection !== 'None'
       ).length / periodReports.length) * 100;
 
       const powerBackupPercent = (periodReports.filter(report => 
-        report.infrastructure.powerBackup
+        report.infrastructure.power_backup
       ).length / periodReports.length) * 100;
 
       return {
@@ -127,22 +127,22 @@ const Dashboard: React.FC<DashboardProps> = ({ schools, reports }) => {
 
     // Infrastructure metrics
     const avgComputers = latestReports.reduce((sum, report) => sum + report.infrastructure.computers, 0) / latestReports.length;
-    const avgFunctionalDevices = latestReports.reduce((sum, report) => sum + report.infrastructure.functionalDevices, 0) / latestReports.length;
-    const internetAccessCount = latestReports.filter(report => report.infrastructure.internetConnection !== 'None').length;
-    const powerBackupCount = latestReports.filter(report => report.infrastructure.powerBackup).length;
+    const avgFunctionalDevices = latestReports.reduce((sum, report) => sum + report.infrastructure.functional_devices, 0) / latestReports.length;
+    const internetAccessCount = latestReports.filter(report => report.infrastructure.internet_connection !== 'None').length;
+    const powerBackupCount = latestReports.filter(report => report.infrastructure.power_backup).length;
 
     // Usage metrics
     const avgTeacherUsage = latestReports.reduce((sum, report) => 
-      sum + (report.usage.teachersUsingICT / report.usage.totalTeachers) * 100, 0
+      sum + (report.usage.teachers_using_ict / report.usage.total_teachers) * 100, 0
     ) / latestReports.length;
-    const avgStudentLiteracy = latestReports.reduce((sum, report) => sum + report.usage.studentDigitalLiteracyRate, 0) / latestReports.length;
-    const avgWeeklyHours = latestReports.reduce((sum, report) => sum + report.usage.weeklyComputerLabHours, 0) / latestReports.length;
+    const avgStudentLiteracy = latestReports.reduce((sum, report) => sum + report.usage.student_digital_literacy_rate, 0) / latestReports.length;
+    const avgWeeklyHours = latestReports.reduce((sum, report) => sum + report.usage.weekly_computer_lab_hours, 0) / latestReports.length;
 
     // Capacity metrics
     const avgTrainedTeachers = latestReports.reduce((sum, report) => 
-      sum + (report.capacity.ictTrainedTeachers / report.usage.totalTeachers) * 100, 0
+      sum + (report.capacity.ict_trained_teachers / report.usage.total_teachers) * 100, 0
     ) / latestReports.length;
-    const avgSupportStaff = latestReports.reduce((sum, report) => sum + report.capacity.supportStaff, 0) / latestReports.length;
+    const avgSupportStaff = latestReports.reduce((sum, report) => sum + report.capacity.support_staff, 0) / latestReports.length;
 
     return {
       infrastructure: {
@@ -172,7 +172,7 @@ const Dashboard: React.FC<DashboardProps> = ({ schools, reports }) => {
     const readinessLevels = { High: 0, Medium: 0, Low: 0 };
     
     schools.forEach(school => {
-      const schoolReports = reports.filter(r => r.schoolId === school.id);
+      const schoolReports = reports.filter(r => r.school_id === school.id);
       const { level } = calculateICTReadinessLevel(schoolReports);
       readinessLevels[level]++;
     });
@@ -194,7 +194,7 @@ const Dashboard: React.FC<DashboardProps> = ({ schools, reports }) => {
       const dataPoint: any = { name: category };
       
       ['Urban', 'Rural'].forEach(environment => {
-        const environmentSchools = schools.filter(school => school.environment === environment);
+        const environmentSchools = schools.filter(school => school.environment === environment.toLowerCase());
         const environmentReports = environmentSchools.map(school => 
           getLatestReport(school.id, reports)
         ).filter(Boolean);
@@ -231,7 +231,7 @@ const Dashboard: React.FC<DashboardProps> = ({ schools, reports }) => {
 
     // Schools with no internet
     const noInternetSchools = latestReports.filter(report => 
-      report.infrastructure.internetConnection === 'None'
+      report.infrastructure.internet_connection === 'None'
     ).length;
     if (noInternetSchools > 0) {
       alerts.push({
@@ -244,7 +244,7 @@ const Dashboard: React.FC<DashboardProps> = ({ schools, reports }) => {
 
     // Schools with low teacher ICT usage
     const lowUsageSchools = latestReports.filter(report => 
-      (report.usage.teachersUsingICT / report.usage.totalTeachers) < 0.3
+      (report.usage.teachers_using_ict / report.usage.total_teachers) < 0.3
     ).length;
     if (lowUsageSchools > 0) {
       alerts.push({
@@ -257,7 +257,7 @@ const Dashboard: React.FC<DashboardProps> = ({ schools, reports }) => {
 
     // Schools with few functional devices
     const lowDeviceSchools = latestReports.filter(report => 
-      report.infrastructure.functionalDevices < 10
+      report.infrastructure.functional_devices < 10
     ).length;
     if (lowDeviceSchools > 0) {
       alerts.push({
@@ -663,15 +663,15 @@ const Dashboard: React.FC<DashboardProps> = ({ schools, reports }) => {
             <tbody className="bg-white divide-y divide-gray-200">
               {schools.slice(0, 5).map((school, index) => {
                 const latestReport = getLatestReport(school.id, reports);
-                const schoolReports = reports.filter(r => r.schoolId === school.id);
+                const schoolReports = reports.filter(r => r.school_id === school.id);
                 const { level, score } = calculateICTReadinessLevel(schoolReports);
                 
                 const strengths = [];
                 if (latestReport) {
-                  if (latestReport.infrastructure.functionalDevices >= 20) strengths.push('Good Infrastructure');
-                  if (latestReport.infrastructure.internetConnection !== 'None') strengths.push('Internet Access');
-                  if ((latestReport.usage.teachersUsingICT / latestReport.usage.totalTeachers) >= 0.7) strengths.push('High Teacher Usage');
-                  if (latestReport.usage.studentDigitalLiteracyRate >= 70) strengths.push('High Student Literacy');
+                  if (latestReport.infrastructure.functional_devices >= 20) strengths.push('Good Infrastructure');
+                  if (latestReport.infrastructure.internet_connection !== 'None') strengths.push('Internet Access');
+                  if ((latestReport.usage.teachers_using_ict / latestReport.usage.total_teachers) >= 0.7) strengths.push('High Teacher Usage');
+                  if (latestReport.usage.student_digital_literacy_rate >= 70) strengths.push('High Student Literacy');
                 }
 
                 return (

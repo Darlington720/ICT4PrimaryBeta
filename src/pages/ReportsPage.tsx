@@ -51,13 +51,15 @@ const ReportsPage: React.FC = () => {
   const [editingReport, setEditingReport] = useState<ICTReport | null>(null);
   const [expandedReport, setExpandedReport] = useState<string | null>(null);
 
+  // console.log("reports", reports)
+
   // Get unique districts and periods for filtering
   const districts = Array.from(new Set(schools.map(school => school.district)));
   const periods = Array.from(new Set(reports.map(report => report.period)));
 
   // Filter reports based on search and filters
   const filteredReports = reports.filter(report => {
-    const school = schools.find(s => s.id === report.schoolId);
+    const school = schools.find(s => s.id === report.school_id);
     if (!school) return false;
 
     const matchesSearch = school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,6 +69,8 @@ const ReportsPage: React.FC = () => {
 
     return matchesSearch && matchesDistrict && matchesPeriod;
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // console.log("filteredReports", filteredReports)
 
   // Handle report edit
   const handleEditReport = (report: ICTReport) => {
@@ -115,21 +119,21 @@ const ReportsPage: React.FC = () => {
       summary.deviceTypes.tablets += report.infrastructure.tablets;
       summary.deviceTypes.projectors += report.infrastructure.projectors;
       summary.deviceTypes.printers += report.infrastructure.printers;
-      summary.totalDevices += report.infrastructure.functionalDevices;
+      summary.totalDevices += report.infrastructure.functional_devices;
 
       // Internet
-      if (report.infrastructure.internetConnection !== 'None') {
+      if (report.infrastructure.internet_connection !== 'None') {
         summary.internetAccess++;
-        summary.avgSpeed += report.infrastructure.internetSpeedMbps;
+        summary.avgSpeed += report.infrastructure.internet_speed_mbps;
       }
-      summary.internetTypes[report.infrastructure.internetConnection.toLowerCase() as keyof typeof summary.internetTypes]++;
+      summary.internetTypes[report.infrastructure.internet_connection.toLowerCase() as keyof typeof summary.internetTypes]++;
 
       // Teacher usage and student literacy
-      summary.teacherUsage += (report.usage.teachersUsingICT / report.usage.totalTeachers) * 100;
-      summary.studentLiteracy += report.usage.studentDigitalLiteracyRate;
+      summary.teacherUsage += (report.usage.teachers_using_ict / report.usage.total_teachers) * 100;
+      summary.studentLiteracy += report.usage.student_digital_literacy_rate;
 
       // Power backup
-      if (report.infrastructure.powerBackup) summary.powerBackup++;
+      if (report.infrastructure.power_backup) summary.power_backup++;
     });
 
     // Calculate averages
@@ -156,20 +160,20 @@ const ReportsPage: React.FC = () => {
 
   // Get observation summary for a report
   const getObservationSummary = (report: ICTReport) => {
-    const school = schools.find(s => s.id === report.schoolId);
+    const school = schools.find(s => s.id === report.school_id);
     if (!school) return null;
 
-    const teacherUsagePercent = Math.round((report.usage.teachersUsingICT / report.usage.totalTeachers) * 100);
-    const trainedTeachersPercent = Math.round((report.capacity.ictTrainedTeachers / report.usage.totalTeachers) * 100);
+    const teacherUsagePercent = Math.round((report.usage.teachers_using_ict / report.usage.total_teachers) * 100);
+    const trainedTeachersPercent = Math.round((report.capacity.ict_trained_teachers / report.usage.total_teachers) * 100);
     
     return {
       school,
       teacherUsagePercent,
       trainedTeachersPercent,
-      hasInternet: report.infrastructure.internetConnection !== 'None',
-      hasPowerBackup: report.infrastructure.powerBackup,
-      functionalDevices: report.infrastructure.functionalDevices,
-      studentLiteracy: report.usage.studentDigitalLiteracyRate
+      hasInternet: report.infrastructure.internet_connection !== 'None',
+      hasPowerBackup: report.infrastructure.power_backup,
+      functionalDevices: report.infrastructure.functional_devices,
+      studentLiteracy: report.usage.student_digital_literacy_rate
     };
   };
 
@@ -184,7 +188,7 @@ const ReportsPage: React.FC = () => {
   }
 
   if (editingReport) {
-    const school = schools.find(s => s.id === editingReport.schoolId);
+    const school = schools.find(s => s.id === editingReport.school_id);
     if (!school) return null;
 
     return (
@@ -398,7 +402,7 @@ const ReportsPage: React.FC = () => {
                         </span>
                       </div>
                       <p className="text-sm text-gray-500 mt-1">
-                        {school.district}, {school.environment} • Observed on {new Date(report.date).toLocaleDateString()}
+                        {school.district}, {school.environment} • Observed on {new Date(report.date).toLocaleDateString('en-GB')}
                       </p>
                     </div>
                     <div className="flex space-x-2">
@@ -494,14 +498,14 @@ const ReportsPage: React.FC = () => {
                             <div className="flex justify-between text-sm">
                               <span>Internet Speed:</span>
                               <span className="font-medium">
-                                {report.infrastructure.internetConnection === 'None' 
+                                {report.infrastructure.internet_connection === 'None' 
                                   ? 'No Internet' 
-                                  : `${report.infrastructure.internetSpeedMbps} Mbps`}
+                                  : `${report.infrastructure.internet_speed_mbps} Mbps`}
                               </span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span>Power Sources:</span>
-                              <span className="font-medium">{report.infrastructure.powerSource.join(', ')}</span>
+                              <span className="font-medium">{report.infrastructure.power_source.join(', ')}</span>
                             </div>
                           </div>
                         </div>
@@ -513,26 +517,26 @@ const ReportsPage: React.FC = () => {
                             <div className="flex justify-between text-sm">
                               <span>Teachers Using ICT:</span>
                               <span className="font-medium">
-                                {report.usage.teachersUsingICT} of {report.usage.totalTeachers}
+                                {report.usage.teachers_using_ict} of {report.usage.total_teachers}
                               </span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span>Weekly Lab Hours:</span>
-                              <span className="font-medium">{report.usage.weeklyComputerLabHours}h</span>
+                              <span className="font-medium">{report.usage.weekly_computer_lab_hours}h</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span>Student Digital Literacy:</span>
-                              <span className="font-medium">{report.usage.studentDigitalLiteracyRate}%</span>
+                              <span className="font-medium">{report.usage.student_digital_literacy_rate}%</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span>ICT-Trained Teachers:</span>
                               <span className="font-medium">
-                                {report.capacity.ictTrainedTeachers} of {report.usage.totalTeachers}
+                                {report.capacity.ict_trained_teachers} of {report.usage.total_teachers}
                               </span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span>Support Staff:</span>
-                              <span className="font-medium">{report.capacity.supportStaff}</span>
+                              <span className="font-medium">{report.capacity.support_staff}</span>
                             </div>
                           </div>
                         </div>
@@ -544,7 +548,7 @@ const ReportsPage: React.FC = () => {
                             <div>
                               <span className="text-sm text-gray-600">Operating Systems:</span>
                               <div className="flex flex-wrap gap-1 mt-1">
-                                {report.software.operatingSystems.map((os) => (
+                                {report.software.operating_systems.map((os) => (
                                   <span key={os} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                                     {os}
                                   </span>
@@ -554,8 +558,8 @@ const ReportsPage: React.FC = () => {
                             <div>
                               <span className="text-sm text-gray-600">Educational Software:</span>
                               <div className="flex flex-wrap gap-1 mt-1">
-                                {report.software.educationalSoftware.length > 0 ? (
-                                  report.software.educationalSoftware.map((software) => (
+                                {report.software.educational_software.length > 0 ? (
+                                  report.software.educational_software.map((software) => (
                                     <span key={software} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                       {software}
                                     </span>
@@ -568,7 +572,7 @@ const ReportsPage: React.FC = () => {
                             <div className="flex justify-between text-sm">
                               <span>Office Applications:</span>
                               <span className="font-medium">
-                                {report.software.officeApplications ? 'Available' : 'Not Available'}
+                                {report.software.office_applications ? 'Available' : 'Not Available'}
                               </span>
                             </div>
                           </div>

@@ -36,7 +36,12 @@ import { useData } from '../../context/DataContext';
 import { calculateICTReadinessLevel, getLatestReport } from '../../utils/calculations';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { LOAD_SCHOOLS } from '../../gql/queries';
-import { ADD_SCHOOL } from '../../gql/mutations';
+
+const formatter = new Intl.DateTimeFormat('en-UG', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
 
 interface SchoolListProps {
   onAddSchool: () => void;
@@ -101,8 +106,8 @@ const SchoolList: React.FC<SchoolListProps> = ({
 
   // Get ICT readiness for a school
   const getSchoolICTReadiness = (school: School): { level: 'Low' | 'Medium' | 'High', score: number, lastReportDate?: string } => {
-    const schoolReports = reports.filter(r => r.schoolId === school.id);
-    const latestReport = getLatestReport(school.id, reports);
+    const schoolReports = school.periodic_observations;
+    const latestReport = getLatestReport(school.id, schoolReports);
     const readiness = calculateICTReadinessLevel(schoolReports);
     
     return {
@@ -160,7 +165,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
         // Update districts list if not already populated
         if (districts.length === 0) {
           const uniqueDistricts = Array.from(
-            new Set(response.data.map(school => school.district))
+            new Set(res.data.schools.map(school => school.district))
           );
           setDistricts(uniqueDistricts);
         }
@@ -230,16 +235,16 @@ const SchoolList: React.FC<SchoolListProps> = ({
         school.name,
         school.district,
         getRegion(school.district),
-        school.subCounty,
+        school.sub_county,
         school.type,
         school.environment,
-        school.enrollmentData.totalStudents,
+        school.total_students,
         readiness.level,
         readiness.score.toFixed(1),
         readiness.lastReportDate || 'No reports',
-        school?.head_teacher_name,
-        school.email,
-        school.phone
+        school?.head_teacher,
+        school.school_email,
+        school.school_phone
       ];
     });
 
@@ -400,10 +405,10 @@ const SchoolList: React.FC<SchoolListProps> = ({
                   onChange={(e) => setFilterRegion(e.target.value)}
                 >
                   <option value="">All Regions</option>
-                  <option value="Central">Central</option>
-                  <option value="Eastern">Eastern</option>
-                  <option value="Northern">Northern</option>
-                  <option value="Western">Western</option>
+                  <option value="central">Central</option>
+                  <option value="eastern">Eastern</option>
+                  <option value="northern">Northern</option>
+                  <option value="western">Western</option>
                 </select>
               </div>
 
@@ -547,13 +552,13 @@ const SchoolList: React.FC<SchoolListProps> = ({
                             <div className="flex items-center">
                               <div>
                                 <div className="text-sm font-medium text-gray-900">{school.name}</div>
-                                <div className="text-sm text-gray-500">{school.head_teacher_name}</div>
+                                <div className="text-sm text-gray-500">{school.head_teacher}</div>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">{school.district}</div>
-                            <div className="text-sm text-gray-500">{region} Region</div>
+                            <div className="text-sm text-gray-500 capitalize">{school.region} Region</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
@@ -561,9 +566,9 @@ const SchoolList: React.FC<SchoolListProps> = ({
                               <span className="text-sm text-gray-900">{school.sub_county}</span>
                             </div>
                             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                              school.location_type === 'Urban' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800'
+                              school.environment === 'Urban' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800'
                             }`}>
-                              {school.location_type}
+                              {school.environment}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -579,7 +584,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
                             {readiness.lastReportDate ? (
                               <div className="flex items-center">
                                 <Calendar className="h-4 w-4 text-gray-400 mr-1" />
-                                {new Date(readiness.lastReportDate).toLocaleDateString()}
+                                {formatter.format(new Date(readiness.lastReportDate))}
                               </div>
                             ) : (
                               <span className="text-gray-400 italic">No reports</span>
@@ -588,11 +593,11 @@ const SchoolList: React.FC<SchoolListProps> = ({
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <Users className="h-4 w-4 text-gray-400 mr-1" />
-                              <span className="text-sm text-gray-900">{school.total_enrollment}</span>
+                              <span className="text-sm text-gray-900">{school.total_students}</span>
                             </div>
-                            {/* <div className="text-xs text-gray-500">
-                              {school.enrollmentData.maleStudents}M • {school.femaleStudents}F
-                            </div> */}
+                            <div className="text-xs text-gray-500">
+                              {school.male_students}M • {school.female_students}F
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex space-x-2">
@@ -604,7 +609,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
                                 <Eye className="h-5 w-5" />
                               </Link>
                               <button
-                                onClick={() => onEditSchool(school.id)}
+                                onClick={() => onEditSchool(school)}
                                 className="text-amber-600 hover:text-amber-900 transition-colors duration-150"
                                 title="Edit School"
                               >
@@ -639,7 +644,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
                             <h3 className="text-lg font-medium text-gray-900">{school.name}</h3>
                             <div className="mt-1 flex items-center text-sm text-gray-500">
                               <MapPin className="h-4 w-4 mr-1" />
-                              {school.district}, {school.subCounty}
+                              {school.district}, {school.sub_county}
                             </div>
                             <div className="text-xs text-gray-400 mt-1">{region} Region</div>
                           </div>
@@ -681,10 +686,10 @@ const SchoolList: React.FC<SchoolListProps> = ({
                           <div className="flex items-center text-sm">
                             <Users className="h-4 w-4 text-gray-400 mr-2" />
                             <span className="text-gray-600">
-                              {school.enrollmentData.totalStudents} Students
+                              {school.total_students} Students
                             </span>
                             <span className="text-gray-400 text-xs ml-2">
-                              ({school.enrollmentData.maleStudents}M, {school.enrollmentData.femaleStudents}F)
+                              ({school.male_students}M, {school.female_students}F)
                             </span>
                           </div>
                           
@@ -701,15 +706,15 @@ const SchoolList: React.FC<SchoolListProps> = ({
                           
                           <div className="flex items-center text-sm">
                             <Mail className="h-4 w-4 text-gray-400 mr-2" />
-                            <a href={`mailto:${school.contactInfo.email}`} className="text-blue-600 hover:text-blue-800 truncate">
-                              {school.contactInfo.email}
+                            <a href={`mailto:${school.school_email}`} className="text-blue-600 hover:text-blue-800 truncate">
+                              {school.school_email}
                             </a>
                           </div>
                           
                           <div className="flex items-center text-sm">
                             <Phone className="h-4 w-4 text-gray-400 mr-2" />
-                            <a href={`tel:${school.contactInfo.phone}`} className="text-blue-600 hover:text-blue-800">
-                              {school.contactInfo.phone}
+                            <a href={`tel:${school.school_phone}`} className="text-blue-600 hover:text-blue-800">
+                              {school.school_phone}
                             </a>
                           </div>
                         </div>

@@ -20,7 +20,8 @@ const SchoolDetailPage: React.FC = () => {
     }
   })
  const [addSchoolPeriodicObservation, {error: addObservationErr, loading: savingObservation}]  =useMutation(ADD_SCHOOL_PERIODIC_OBSERVATION, {
-    refetchQueries: [LOAD_SCHOOL_PERIODIC_OBSERVATIONS]
+  refetchQueries: [{ query: LOAD_SCHOOL_DETAILS, variables: { schoolId } }],
+  awaitRefetchQueries: true,
   })
   
   let school = null;
@@ -41,12 +42,13 @@ const SchoolDetailPage: React.FC = () => {
         payload: reportData
       }
     })
-    // if (reportData.id) {
-    //   await updateReport(reportData);
-    // } else {
-    //   await addReport(reportData);
-    // }
-    // setIsAddingObservation(false);
+    if (reportData.id) {
+      await updateReport(reportData);
+
+    } else {
+      // await addReport(reportData);
+      setIsAddingObservation(false);
+    }
   };
 
   const handleCancel = () => {
@@ -95,10 +97,10 @@ const SchoolDetailPage: React.FC = () => {
       ) : (
         <SchoolDetail
           school={school}
-          reports={reports.filter(r => r.schoolId === schoolId)}
+          reports={school?.periodic_observations || []}
           onAddReport={handleAddObservation}
           onBack={handleBack}
-          onUpdateReport={updateReport}
+          onUpdateReport={handleObservationSubmit}
         />
       )}
     </Layout>

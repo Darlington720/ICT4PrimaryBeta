@@ -9,6 +9,7 @@ export interface School {
   };
   type: 'Public' | 'Private';
   environment: 'Urban' | 'Rural';
+  region: string;
   
   // Basic Information
   emisNumber?: string;
