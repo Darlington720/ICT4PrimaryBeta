@@ -21,7 +21,7 @@ export const getRolePermissions = (
     case "ministry_admin":
       return {
         canViewAllSchools: true,
-        canEditAllSchools: true,
+        canEditAllSchools: false,
         canDeleteSchools: false,
         canViewAllReports: true,
         canEditAllReports: true,
@@ -34,7 +34,7 @@ export const getRolePermissions = (
     case "district_admin":
       return {
         canViewAllSchools: true,
-        canEditAllSchools: true,
+        canEditAllSchools: false,
         canDeleteSchools: false,
         canViewAllReports: true,
         canEditAllReports: true,
@@ -47,10 +47,10 @@ export const getRolePermissions = (
 
     case "school_admin":
       return {
-        canViewAllSchools: false,
+        canViewAllSchools: true,
         canEditAllSchools: false,
         canDeleteSchools: false,
-        canViewAllReports: false,
+        canViewAllReports: true,
         canEditAllReports: true,
         canDeleteReports: false,
         canManageUsers: false,

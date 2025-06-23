@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Search, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  PlusCircle, 
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  Search,
+  Edit,
+  Trash2,
+  Eye,
+  PlusCircle,
   Download,
   LayoutGrid,
   LayoutList,
@@ -26,21 +26,26 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
-  ChevronsRight
-} from 'lucide-react';
-import { School, ICTReport } from '../../types';
-import Card from '../common/Card';
-import PageHeader from '../common/PageHeader';
-import VirtualizedSchoolList from './VirtualizedSchoolList';
-import { useData } from '../../context/DataContext';
-import { calculateICTReadinessLevel, getLatestReport } from '../../utils/calculations';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { LOAD_SCHOOLS } from '../../gql/queries';
+  ChevronsRight,
+} from "lucide-react";
+import { School, ICTReport } from "../../types";
+import Card from "../common/Card";
+import PageHeader from "../common/PageHeader";
+import VirtualizedSchoolList from "./VirtualizedSchoolList";
+import { useData } from "../../context/DataContext";
+import {
+  calculateICTReadinessLevel,
+  getLatestReport,
+} from "../../utils/calculations";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { LOAD_SCHOOLS } from "../../gql/queries";
+import { getRolePermissions } from "../../utils/rolePermissions";
+import { useAuth } from "../../context/AuthContext";
 
-const formatter = new Intl.DateTimeFormat('en-UG', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
+const formatter = new Intl.DateTimeFormat("en-UG", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
 });
 
 interface SchoolListProps {
@@ -52,27 +57,33 @@ interface SchoolListProps {
 const SCHOOLS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
 const DEFAULT_PAGE_SIZE = 25;
 
-const SchoolList: React.FC<SchoolListProps> = ({ 
+const SchoolList: React.FC<SchoolListProps> = ({
   onAddSchool,
   onEditSchool,
-  onDeleteSchool
+  onDeleteSchool,
 }) => {
+  const { user, logout } = useAuth();
   const { fetchSchools, loading, error, totalSchools, reports } = useData();
   const [schools, setSchools] = useState<School[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterDistrict, setFilterDistrict] = useState<string>('');
-  const [filterRegion, setFilterRegion] = useState<string>('');
-  const [filterICTReadiness, setFilterICTReadiness] = useState<string>('');
-  const [filterLocationType, setFilterLocationType] = useState<string>('');
-  const [filterDateFrom, setFilterDateFrom] = useState<string>('');
-  const [filterDateTo, setFilterDateTo] = useState<string>('');
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterDistrict, setFilterDistrict] = useState<string>("");
+  const [filterRegion, setFilterRegion] = useState<string>("");
+  const [filterICTReadiness, setFilterICTReadiness] = useState<string>("");
+  const [filterLocationType, setFilterLocationType] = useState<string>("");
+  const [filterDateFrom, setFilterDateFrom] = useState<string>("");
+  const [filterDateTo, setFilterDateTo] = useState<string>("");
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [districts, setDistricts] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [filteredTotal, setFilteredTotal] = useState(0);
-  const [loadAllSchools, {data, loading: loadingQuery, error: errorQuery}] = useLazyQuery(LOAD_SCHOOLS);
+  const [loadAllSchools, { data, loading: loadingQuery, error: errorQuery }] =
+    useLazyQuery(LOAD_SCHOOLS);
+
+  if (!user) return null;
+
+  const permissions = getRolePermissions(user.role, user);
 
   // Debounced search
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
@@ -88,10 +99,74 @@ const SchoolList: React.FC<SchoolListProps> = ({
 
   // Uganda regions mapping
   const regionMapping: Record<string, string[]> = {
-    'Central': ['Kampala', 'Wakiso', 'Mukono', 'Mpigi', 'Butambala', 'Gomba', 'Kalangala', 'Kalungu', 'Kyotera', 'Lwengo', 'Lyantonde', 'Masaka', 'Rakai', 'Sembabule', 'Bukomansimbi'],
-    'Eastern': ['Jinja', 'Iganga', 'Kamuli', 'Bugiri', 'Mayuge', 'Luuka', 'Namutumba', 'Buyende', 'Kaliro', 'Mbale', 'Sironko', 'Manafwa', 'Bududa', 'Namisindwa', 'Bulambuli'],
-    'Northern': ['Gulu', 'Kitgum', 'Pader', 'Agago', 'Amuru', 'Nwoya', 'Lamwo', 'Lira', 'Oyam', 'Kole', 'Alebtong', 'Otuke', 'Dokolo', 'Amolatar', 'Apac'],
-    'Western': ['Mbarara', 'Ntungamo', 'Isingiro', 'Kiruhura', 'Ibanda', 'Bushenyi', 'Mitooma', 'Rubirizi', 'Sheema', 'Buhweju', 'Fort Portal', 'Kabarole', 'Kyenjojo', 'Kamwenge', 'Kyegegwa']
+    Central: [
+      "Kampala",
+      "Wakiso",
+      "Mukono",
+      "Mpigi",
+      "Butambala",
+      "Gomba",
+      "Kalangala",
+      "Kalungu",
+      "Kyotera",
+      "Lwengo",
+      "Lyantonde",
+      "Masaka",
+      "Rakai",
+      "Sembabule",
+      "Bukomansimbi",
+    ],
+    Eastern: [
+      "Jinja",
+      "Iganga",
+      "Kamuli",
+      "Bugiri",
+      "Mayuge",
+      "Luuka",
+      "Namutumba",
+      "Buyende",
+      "Kaliro",
+      "Mbale",
+      "Sironko",
+      "Manafwa",
+      "Bududa",
+      "Namisindwa",
+      "Bulambuli",
+    ],
+    Northern: [
+      "Gulu",
+      "Kitgum",
+      "Pader",
+      "Agago",
+      "Amuru",
+      "Nwoya",
+      "Lamwo",
+      "Lira",
+      "Oyam",
+      "Kole",
+      "Alebtong",
+      "Otuke",
+      "Dokolo",
+      "Amolatar",
+      "Apac",
+    ],
+    Western: [
+      "Mbarara",
+      "Ntungamo",
+      "Isingiro",
+      "Kiruhura",
+      "Ibanda",
+      "Bushenyi",
+      "Mitooma",
+      "Rubirizi",
+      "Sheema",
+      "Buhweju",
+      "Fort Portal",
+      "Kabarole",
+      "Kyenjojo",
+      "Kamwenge",
+      "Kyegegwa",
+    ],
   };
 
   // Get region for a district
@@ -101,18 +176,24 @@ const SchoolList: React.FC<SchoolListProps> = ({
         return region;
       }
     }
-    return 'Other';
+    return "Other";
   };
 
   // Get ICT readiness for a school
-  const getSchoolICTReadiness = (school: School): { level: 'Low' | 'Medium' | 'High', score: number, lastReportDate?: string } => {
+  const getSchoolICTReadiness = (
+    school: School
+  ): {
+    level: "Low" | "Medium" | "High";
+    score: number;
+    lastReportDate?: string;
+  } => {
     const schoolReports = school.periodic_observations;
     const latestReport = getLatestReport(school.id, schoolReports);
     const readiness = calculateICTReadinessLevel(schoolReports);
-    
+
     return {
       ...readiness,
-      lastReportDate: latestReport?.date
+      lastReportDate: latestReport?.date,
     };
   };
 
@@ -120,57 +201,57 @@ const SchoolList: React.FC<SchoolListProps> = ({
   useEffect(() => {
     const loadSchools = async () => {
       try {
-        const res = await loadAllSchools()
+        const res = await loadAllSchools();
         let filteredSchools = res.data?.schools;
 
         // Apply additional filters
         if (filterRegion) {
-          filteredSchools = filteredSchools.filter(school => 
-            getRegion(school.district) === filterRegion
+          filteredSchools = filteredSchools.filter(
+            (school) => getRegion(school.district) === filterRegion
           );
         }
 
         if (filterLocationType) {
-          filteredSchools = filteredSchools.filter(school => 
-            school.environment === filterLocationType
+          filteredSchools = filteredSchools.filter(
+            (school) => school.environment === filterLocationType
           );
         }
 
         if (filterICTReadiness) {
-          filteredSchools = filteredSchools.filter(school => {
+          filteredSchools = filteredSchools.filter((school) => {
             const readiness = getSchoolICTReadiness(school);
             return readiness.level === filterICTReadiness;
           });
         }
 
         if (filterDateFrom || filterDateTo) {
-          filteredSchools = filteredSchools.filter(school => {
+          filteredSchools = filteredSchools.filter((school) => {
             const latestReport = getLatestReport(school.id, reports);
             if (!latestReport) return false;
-            
+
             const reportDate = new Date(latestReport.date);
             const fromDate = filterDateFrom ? new Date(filterDateFrom) : null;
             const toDate = filterDateTo ? new Date(filterDateTo) : null;
-            
+
             if (fromDate && reportDate < fromDate) return false;
             if (toDate && reportDate > toDate) return false;
-            
+
             return true;
           });
         }
 
         setSchools(filteredSchools);
         setFilteredTotal(filteredSchools.length);
-        
+
         // Update districts list if not already populated
         if (districts.length === 0) {
           const uniqueDistricts = Array.from(
-            new Set(res.data.schools.map(school => school.district))
+            new Set(res.data.schools.map((school) => school.district))
           );
           setDistricts(uniqueDistricts);
         }
       } catch (error) {
-        console.error('Failed to fetch schools:', error);
+        console.error("Failed to fetch schools:", error);
       }
     };
 
@@ -187,12 +268,16 @@ const SchoolList: React.FC<SchoolListProps> = ({
     const range = [];
     const rangeWithDots = [];
 
-    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
       range.push(i);
     }
 
     if (currentPage - delta > 2) {
-      rangeWithDots.push(1, '...');
+      rangeWithDots.push(1, "...");
     } else {
       rangeWithDots.push(1);
     }
@@ -200,7 +285,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
     rangeWithDots.push(...range);
 
     if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push('...', totalPages);
+      rangeWithDots.push("...", totalPages);
     } else if (totalPages > 1) {
       rangeWithDots.push(totalPages);
     }
@@ -212,7 +297,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
     if (page >= 1 && page <= totalPages && !loading) {
       setCurrentPage(page);
       // Scroll to top when changing pages
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -224,12 +309,22 @@ const SchoolList: React.FC<SchoolListProps> = ({
   const handleExport = () => {
     // Create CSV content with enhanced data
     const headers = [
-      'Name', 'District', 'Region', 'Sub-County', 'Type', 'Environment', 
-      'Total Students', 'ICT Readiness Level', 'ICT Readiness Score', 
-      'Last Report Date', 'Principal', 'Email', 'Phone'
+      "Name",
+      "District",
+      "Region",
+      "Sub-County",
+      "Type",
+      "Environment",
+      "Total Students",
+      "ICT Readiness Level",
+      "ICT Readiness Score",
+      "Last Report Date",
+      "Principal",
+      "Email",
+      "Phone",
     ];
-    
-    const rows = schools.map(school => {
+
+    const rows = schools.map((school) => {
       const readiness = getSchoolICTReadiness(school);
       return [
         school.name,
@@ -241,58 +336,70 @@ const SchoolList: React.FC<SchoolListProps> = ({
         school.total_students,
         readiness.level,
         readiness.score.toFixed(1),
-        readiness.lastReportDate || 'No reports',
+        readiness.lastReportDate || "No reports",
         school?.head_teacher,
         school.school_email,
-        school.school_phone
+        school.school_phone,
       ];
     });
 
     const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n');
+      headers.join(","),
+      ...rows.map((row) => row.join(",")),
+    ].join("\n");
 
     // Create and download file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `schools_export_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `schools_export_${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
     link.click();
   };
 
   const clearFilters = () => {
-    setFilterDistrict('');
-    setFilterRegion('');
-    setFilterICTReadiness('');
-    setFilterLocationType('');
-    setFilterDateFrom('');
-    setFilterDateTo('');
-    setSearchTerm('');
+    setFilterDistrict("");
+    setFilterRegion("");
+    setFilterICTReadiness("");
+    setFilterLocationType("");
+    setFilterDateFrom("");
+    setFilterDateTo("");
+    setSearchTerm("");
   };
 
-  const getReadinessColor = (level: 'Low' | 'Medium' | 'High') => {
+  const getReadinessColor = (level: "Low" | "Medium" | "High") => {
     switch (level) {
-      case 'High': return 'text-green-600 bg-green-100';
-      case 'Medium': return 'text-amber-600 bg-amber-100';
-      case 'Low': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "High":
+        return "text-green-600 bg-green-100";
+      case "Medium":
+        return "text-amber-600 bg-amber-100";
+      case "Low":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
-  const getReadinessIcon = (level: 'Low' | 'Medium' | 'High') => {
+  const getReadinessIcon = (level: "Low" | "Medium" | "High") => {
     switch (level) {
-      case 'High': return <CheckCircle className="h-4 w-4" />;
-      case 'Medium': return <Clock className="h-4 w-4" />;
-      case 'Low': return <AlertTriangle className="h-4 w-4" />;
-      default: return <AlertTriangle className="h-4 w-4" />;
+      case "High":
+        return <CheckCircle className="h-4 w-4" />;
+      case "Medium":
+        return <Clock className="h-4 w-4" />;
+      case "Low":
+        return <AlertTriangle className="h-4 w-4" />;
+      default:
+        return <AlertTriangle className="h-4 w-4" />;
     }
   };
 
   if (errorQuery) {
     return (
       <div className="text-center py-8">
-        <p className="text-red-600">Error loading schools: {errorQuery.message}</p>
+        <p className="text-red-600">
+          Error loading schools: {errorQuery.message}
+        </p>
         <button
           onClick={() => fetchSchools(currentPage, pageSize)}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -303,11 +410,10 @@ const SchoolList: React.FC<SchoolListProps> = ({
     );
   }
 
-
   return (
     <div>
-      <PageHeader 
-        title="Schools" 
+      <PageHeader
+        title="Schools"
         description={`Manage and view all registered schools (${totalSchools} total)`}
         action={
           <div className="flex space-x-2">
@@ -318,7 +424,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
               <Download className="mr-2 h-4 w-4" />
               Export
             </button>
-            <button 
+            <button
               onClick={onAddSchool}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
@@ -344,7 +450,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="w-full sm:w-48">
             <select
               className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
@@ -352,8 +458,10 @@ const SchoolList: React.FC<SchoolListProps> = ({
               onChange={(e) => setFilterDistrict(e.target.value)}
             >
               <option value="">All Districts</option>
-              {districts.map(district => (
-                <option key={district} value={district}>{district}</option>
+              {districts.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
               ))}
             </select>
           </div>
@@ -362,30 +470,36 @@ const SchoolList: React.FC<SchoolListProps> = ({
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium ${
-                showFilters ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-700 hover:bg-gray-50'
+                showFilters
+                  ? "bg-blue-50 text-blue-700 border-blue-300"
+                  : "bg-white text-gray-700 hover:bg-gray-50"
               } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
             >
               <Filter className="mr-2 h-4 w-4" />
               Filters
-              <ChevronDown className={`ml-1 h-4 w-4 transform transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`ml-1 h-4 w-4 transform transition-transform ${
+                  showFilters ? "rotate-180" : ""
+                }`}
+              />
             </button>
-            
+
             <button
-              onClick={() => setViewMode('table')}
+              onClick={() => setViewMode("table")}
               className={`p-2 rounded-md ${
-                viewMode === 'table' 
-                  ? 'bg-blue-100 text-blue-600' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                viewMode === "table"
+                  ? "bg-blue-100 text-blue-600"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               <LayoutList className="h-5 w-5" />
             </button>
             <button
-              onClick={() => setViewMode('grid')}
+              onClick={() => setViewMode("grid")}
               className={`p-2 rounded-md ${
-                viewMode === 'grid' 
-                  ? 'bg-blue-100 text-blue-600' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                viewMode === "grid"
+                  ? "bg-blue-100 text-blue-600"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               <LayoutGrid className="h-5 w-5" />
@@ -398,7 +512,9 @@ const SchoolList: React.FC<SchoolListProps> = ({
           <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Region
+                </label>
                 <select
                   className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                   value={filterRegion}
@@ -413,7 +529,9 @@ const SchoolList: React.FC<SchoolListProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">ICT Readiness</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  ICT Readiness
+                </label>
                 <select
                   className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                   value={filterICTReadiness}
@@ -427,7 +545,9 @@ const SchoolList: React.FC<SchoolListProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Location Type
+                </label>
                 <select
                   className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                   value={filterLocationType}
@@ -440,7 +560,9 @@ const SchoolList: React.FC<SchoolListProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Report Date From</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Report Date From
+                </label>
                 <input
                   type="date"
                   className="block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
@@ -450,7 +572,9 @@ const SchoolList: React.FC<SchoolListProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Report Date To</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Report Date To
+                </label>
                 <input
                   type="date"
                   className="block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
@@ -482,15 +606,20 @@ const SchoolList: React.FC<SchoolListProps> = ({
               </div>
             ) : (
               <>
-                Showing {schools.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{' '}
-                {Math.min(currentPage * pageSize, filteredTotal)} of {filteredTotal} schools
+                Showing{" "}
+                {schools.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{" "}
+                {Math.min(currentPage * pageSize, filteredTotal)} of{" "}
+                {filteredTotal} schools
                 {filteredTotal !== totalSchools && (
-                  <span className="text-gray-500"> (filtered from {totalSchools} total)</span>
+                  <span className="text-gray-500">
+                    {" "}
+                    (filtered from {totalSchools} total)
+                  </span>
                 )}
               </>
             )}
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <label className="text-sm text-gray-700">Show:</label>
             <select
@@ -499,8 +628,10 @@ const SchoolList: React.FC<SchoolListProps> = ({
               className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={loading}
             >
-              {SCHOOLS_PER_PAGE_OPTIONS.map(size => (
-                <option key={size} value={size}>{size}</option>
+              {SCHOOLS_PER_PAGE_OPTIONS.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
               ))}
             </select>
             <span className="text-sm text-gray-700">per page</span>
@@ -513,30 +644,51 @@ const SchoolList: React.FC<SchoolListProps> = ({
           </div>
         ) : (
           <>
-            {viewMode === 'table' ? (
+            {viewMode === "table" ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col\" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col\"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         School Name
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         District
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Location
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         ICT Readiness
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Last Report Date
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Students
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Actions
                       </th>
                     </tr>
@@ -545,58 +697,85 @@ const SchoolList: React.FC<SchoolListProps> = ({
                     {schools.map((school) => {
                       const readiness = getSchoolICTReadiness(school);
                       const region = getRegion(school.district);
-                      
+
                       return (
                         <tr key={school.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div>
-                                <div className="text-sm font-medium text-gray-900">{school.name}</div>
-                                <div className="text-sm text-gray-500">{school.head_teacher}</div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  {school.name}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {school.head_teacher}
+                                </div>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{school.district}</div>
-                            <div className="text-sm text-gray-500 capitalize">{school.region} Region</div>
+                            <div className="text-sm text-gray-900">
+                              {school.district}
+                            </div>
+                            <div className="text-sm text-gray-500 capitalize">
+                              {school.region} Region
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <MapPin className="h-4 w-4 text-gray-400 mr-1" />
-                              <span className="text-sm text-gray-900">{school.sub_county}</span>
+                              <span className="text-sm text-gray-900">
+                                {school.sub_county}
+                              </span>
                             </div>
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                              school.environment === 'Urban' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800'
-                            }`}>
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                school.environment === "Urban"
+                                  ? "bg-purple-100 text-purple-800"
+                                  : "bg-orange-100 text-orange-800"
+                              }`}
+                            >
                               {school.environment}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getReadinessColor(readiness.level)}`}>
+                              <span
+                                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getReadinessColor(
+                                  readiness.level
+                                )}`}
+                              >
                                 {getReadinessIcon(readiness.level)}
                                 <span className="ml-1">{readiness.level}</span>
                               </span>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1">Score: {readiness.score.toFixed(1)}/100</div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              Score: {readiness.score.toFixed(1)}/100
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {readiness.lastReportDate ? (
                               <div className="flex items-center">
                                 <Calendar className="h-4 w-4 text-gray-400 mr-1" />
-                                {formatter.format(new Date(readiness.lastReportDate))}
+                                {formatter.format(
+                                  new Date(readiness.lastReportDate)
+                                )}
                               </div>
                             ) : (
-                              <span className="text-gray-400 italic">No reports</span>
+                              <span className="text-gray-400 italic">
+                                No reports
+                              </span>
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <Users className="h-4 w-4 text-gray-400 mr-1" />
-                              <span className="text-sm text-gray-900">{school.total_students}</span>
+                              <span className="text-sm text-gray-900">
+                                {school.total_students}
+                              </span>
                             </div>
                             <div className="text-xs text-gray-500">
-                              {school.male_students}M • {school.female_students}F
+                              {school.male_students}M • {school.female_students}
+                              F
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -608,20 +787,24 @@ const SchoolList: React.FC<SchoolListProps> = ({
                               >
                                 <Eye className="h-5 w-5" />
                               </Link>
-                              <button
-                                onClick={() => onEditSchool(school)}
-                                className="text-amber-600 hover:text-amber-900 transition-colors duration-150"
-                                title="Edit School"
-                              >
-                                <Edit className="h-5 w-5" />
-                              </button>
-                              <button
-                                onClick={() => onDeleteSchool(school.id)}
-                                className="text-red-600 hover:text-red-900 transition-colors duration-150"
-                                title="Delete School"
-                              >
-                                <Trash2 className="h-5 w-5" />
-                              </button>
+                              {permissions.canEditAllSchools && (
+                                <button
+                                  onClick={() => onEditSchool(school)}
+                                  className="text-amber-600 hover:text-amber-900 transition-colors duration-150"
+                                  title="Edit School"
+                                >
+                                  <Edit className="h-5 w-5" />
+                                </button>
+                              )}
+                              {permissions.canDeleteSchools && (
+                                <button
+                                  onClick={() => onDeleteSchool(school.id)}
+                                  className="text-red-600 hover:text-red-900 transition-colors duration-150"
+                                  title="Delete School"
+                                >
+                                  <Trash2 className="h-5 w-5" />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -635,28 +818,43 @@ const SchoolList: React.FC<SchoolListProps> = ({
                 {schools.map((school) => {
                   const readiness = getSchoolICTReadiness(school);
                   const region = getRegion(school.district);
-                  
+
                   return (
-                    <div key={school.id} className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <div
+                      key={school.id}
+                      className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200"
+                    >
                       <div className="p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
-                            <h3 className="text-lg font-medium text-gray-900">{school.name}</h3>
+                            <h3 className="text-lg font-medium text-gray-900">
+                              {school.name}
+                            </h3>
                             <div className="mt-1 flex items-center text-sm text-gray-500">
                               <MapPin className="h-4 w-4 mr-1" />
                               {school.district}, {school.sub_county}
                             </div>
-                            <div className="text-xs text-gray-400 mt-1">{region} Region</div>
+                            <div className="text-xs text-gray-400 mt-1">
+                              {region} Region
+                            </div>
                           </div>
                           <div className="flex flex-col items-end space-y-2">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              school.type === 'Public' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                            }`}>
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                school.type === "Public"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
+                            >
                               {school.type}
                             </span>
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              school.environment === 'Urban' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800'
-                            }`}>
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                school.environment === "Urban"
+                                  ? "bg-purple-100 text-purple-800"
+                                  : "bg-orange-100 text-orange-800"
+                              }`}
+                            >
                               {school.environment}
                             </span>
                           </div>
@@ -665,8 +863,14 @@ const SchoolList: React.FC<SchoolListProps> = ({
                         {/* ICT Readiness */}
                         <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-700">ICT Readiness</span>
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getReadinessColor(readiness.level)}`}>
+                            <span className="text-sm font-medium text-gray-700">
+                              ICT Readiness
+                            </span>
+                            <span
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getReadinessColor(
+                                readiness.level
+                              )}`}
+                            >
                               {getReadinessIcon(readiness.level)}
                               <span className="ml-1">{readiness.level}</span>
                             </span>
@@ -674,7 +878,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
                           <div className="mt-1 text-xs text-gray-500">
                             Score: {readiness.score.toFixed(1)}/100
                           </div>
-                          {readiness.level === 'High' && (
+                          {readiness.level === "High" && (
                             <div className="mt-1 flex items-center text-xs text-green-600">
                               <Award className="h-3 w-3 mr-1" />
                               Top Performer
@@ -689,31 +893,38 @@ const SchoolList: React.FC<SchoolListProps> = ({
                               {school.total_students} Students
                             </span>
                             <span className="text-gray-400 text-xs ml-2">
-                              ({school.male_students}M, {school.female_students}F)
+                              ({school.male_students}M, {school.female_students}
+                              F)
                             </span>
                           </div>
-                          
+
                           <div className="flex items-center text-sm">
                             <Calendar className="h-4 w-4 text-gray-400 mr-2" />
                             <span className="text-gray-600">
-                              {readiness.lastReportDate ? (
-                                `Last Report: ${new Date(readiness.lastReportDate).toLocaleDateString()}`
-                              ) : (
-                                'No reports available'
-                              )}
+                              {readiness.lastReportDate
+                                ? `Last Report: ${new Date(
+                                    readiness.lastReportDate
+                                  ).toLocaleDateString()}`
+                                : "No reports available"}
                             </span>
                           </div>
-                          
+
                           <div className="flex items-center text-sm">
                             <Mail className="h-4 w-4 text-gray-400 mr-2" />
-                            <a href={`mailto:${school.school_email}`} className="text-blue-600 hover:text-blue-800 truncate">
+                            <a
+                              href={`mailto:${school.school_email}`}
+                              className="text-blue-600 hover:text-blue-800 truncate"
+                            >
                               {school.school_email}
                             </a>
                           </div>
-                          
+
                           <div className="flex items-center text-sm">
                             <Phone className="h-4 w-4 text-gray-400 mr-2" />
-                            <a href={`tel:${school.school_phone}`} className="text-blue-600 hover:text-blue-800">
+                            <a
+                              href={`tel:${school.school_phone}`}
+                              className="text-blue-600 hover:text-blue-800"
+                            >
                               {school.school_phone}
                             </a>
                           </div>
@@ -727,20 +938,24 @@ const SchoolList: React.FC<SchoolListProps> = ({
                             <Eye className="h-4 w-4 mr-1" />
                             View
                           </Link>
-                          <button
-                            onClick={() => onEditSchool(school.id)}
-                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded text-white bg-amber-600 hover:bg-amber-700"
-                          >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => onDeleteSchool(school.id)}
-                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded text-white bg-red-600 hover:bg-red-700"
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            Delete
-                          </button>
+                          {permissions.canEditAllSchools && (
+                            <button
+                              onClick={() => onEditSchool(school.id)}
+                              className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded text-white bg-amber-600 hover:bg-amber-700"
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </button>
+                          )}
+                          {permissions.canDeleteSchools && (
+                            <button
+                              onClick={() => onDeleteSchool(school.id)}
+                              className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded text-white bg-red-600 hover:bg-red-700"
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Delete
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -778,9 +993,10 @@ const SchoolList: React.FC<SchoolListProps> = ({
                 {/* Desktop pagination */}
                 <div className="hidden sm:flex sm:items-center sm:justify-between w-full">
                   <div className="text-sm text-gray-700">
-                    Showing page {currentPage} of {totalPages} ({filteredTotal} total schools)
+                    Showing page {currentPage} of {totalPages} ({filteredTotal}{" "}
+                    total schools)
                   </div>
-                  
+
                   <div className="flex items-center space-x-1">
                     {/* First page */}
                     <button
@@ -805,7 +1021,7 @@ const SchoolList: React.FC<SchoolListProps> = ({
                     {/* Page numbers */}
                     {generatePageNumbers().map((pageNum, index) => (
                       <React.Fragment key={index}>
-                        {pageNum === '...' ? (
+                        {pageNum === "..." ? (
                           <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
                             ...
                           </span>
@@ -815,9 +1031,11 @@ const SchoolList: React.FC<SchoolListProps> = ({
                             disabled={loading}
                             className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${
                               currentPage === pageNum
-                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                            } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
+                                : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                            } ${
+                              loading ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                           >
                             {pageNum}
                           </button>
@@ -853,7 +1071,9 @@ const SchoolList: React.FC<SchoolListProps> = ({
               <div className="text-center py-8 text-gray-500">
                 <SchoolIcon className="h-12 w-12 mx-auto text-gray-300 mb-4" />
                 <p>No schools found matching your search criteria.</p>
-                <p className="text-sm mt-2">Try adjusting your filters or search terms.</p>
+                <p className="text-sm mt-2">
+                  Try adjusting your filters or search terms.
+                </p>
               </div>
             )}
           </>
