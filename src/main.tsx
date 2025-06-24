@@ -5,7 +5,7 @@ import App from "./App.tsx";
 import "./index.css";
 
 const client = new ApolloClient({
-  uri: "http://localhost:4000/graphql",
+  uri: "https://tredumo.com/observatory_api/",
   cache: new InMemoryCache(),
 });
 
